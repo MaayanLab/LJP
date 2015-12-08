@@ -1,0 +1,17 @@
+body {
+	overflow:hidden;
+	margin:0;
+}
+
+text {
+	font-family: sans-serif;
+	pointer-events: none;
+}
+
+
+.tooltip {
+	position: absolute;
+	width: 200px;
+	height: 28px;
+	pointer-events: none;
+}
