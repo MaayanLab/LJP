@@ -14,6 +14,32 @@ var x = d3.scale.linear()
 var y = d3.scale.linear()
     .range([h, 0]);
 
+// for user to read
+var readableMap = {
+	shapeAttr: 'Shape by:',
+	colorAttr: 'Color by:',
+	sizeAttr: 'Size by:',
+	CellLine: 'Cell line',
+	Time: 'Time point',
+	Conc: 'Concentration',
+	DrugClass: 'Drug class',
+	Cidx: 'Cluster index',
+	pathway_role: 'Pathway role',
+	cellular_function: 'Cellular function',
+	GRvalue: 'GR value',
+	'-logPvalue': '-log p-value',
+	CELL_CYCLE: 'Cell cycle',
+	SRC_family: 'SRC family',
+	DNA_repair: 'DNA repair',
+}
+
+function convertName (name) {
+	if (readableMap.hasOwnProperty(name)) {
+		name = readableMap[name];
+	}
+	return name;
+}
+
 // for controls and display of nodes
 var controlAttrs = {
 	shapeAttr: ["CellLine", 'Time', "Conc"],
@@ -21,6 +47,8 @@ var controlAttrs = {
 		"GRvalue", "-logPvalue"],
 	sizeAttr: ["GRvalue", "-logPvalue", "Time", "Conc"],
 }
+
+
 
 var text_center = false;
 var outline = false;
@@ -45,12 +73,15 @@ var legendG = svg.append("g")
 	.attr("transform", "translate(20, 20)");
 legendG.append("g")
 	.attr("id", "legendShape")
+	.attr("class", "legendPanel")
 	.attr("transform", "translate(0, 0)");
 legendG.append("g")
 	.attr("id", "legendSize")
+	.attr("class", "legendPanel")
 	.attr("transform", "translate(0, 170)");
 legendG.append("g")
 	.attr("id", "legendColor")
+	.attr("class", "legendPanel")
 	.attr("transform", "translate(0, 260)");
 
 
@@ -61,12 +92,12 @@ var controlers = d3.select("#controlers")
 var params = _.mapObject(controlAttrs, function(val, key){
 	var div = controlers.append("div")
 		.attr("class", "form-group");
-	div.append("label").attr("class", "control-label").text(key);
+	div.append("label").attr("class", "control-label").text(convertName(key));
 	var s = div.append("select").attr("id", key)
 		.attr("class", "form-control");
 	for (var i = 0; i < val.length; i++) {
 		var item = val[i];
-		s.append("option").text(item)
+		s.append("option").text(convertName(item))
 			.attr("value", item);
 	};
 	return val[0];
@@ -75,7 +106,7 @@ var params = _.mapObject(controlAttrs, function(val, key){
 var div = controlers.append("div")
 	.attr("class", "form-group");
 div.append("label").attr("class", "control-label")
-	.text("Show node label");
+	.text("Show labels");
 div.append("span").text(" ");
 div.append("input")
 	.attr("id", "show_text")
@@ -279,19 +310,24 @@ d3.json(graph_fn, function(error, graph) {
 
 		// 3. update the legends
 		legendShape.scale(shapeL)
-			.title(shapeAttr)
+			.title(convertName(shapeAttr))
 		svg.select("#legendShape").html("")
 			.call(legendShape);
 
 		legendColor.scale(color)
-			.title(colorAttr);
+			.title(convertName(colorAttr));
 		svg.select("#legendColor").html("")
 			.call(legendColor);
 
 		legendSize.scale(size)
-			.title(sizeAttr)
+			.title(convertName(sizeAttr))
 		svg.select("#legendSize").html("")
 			.call(legendSize);
+		// update legend text
+		d3.selectAll("text.label").each(function(d, i){
+			if (typeof d === "string") d3.select(this).text(convertName(d));
+		});
+
 		// 4. update zoom
 		zoom.on("zoom", function() {
 			var stroke = nominal_stroke;
