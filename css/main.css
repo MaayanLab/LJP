@@ -12,6 +12,10 @@ text {
 .tooltip {
 	position: absolute;
 	width: 200px;
-	height: 28px;
 	pointer-events: none;
+	background-color: #eee;
+}
+
+#controlers {
+	cursor: move;
 }

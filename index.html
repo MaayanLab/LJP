@@ -81,14 +81,13 @@ legendG.append("g")
 
 
 // Create DOM for controlers
-
 var controlers = d3.select("#controlers")
 	.attr("class", "well form-horizontal");
 
 var params = _.mapObject(controlAttrs, function(val, key){
 	var div = controlers.append("div")
 		.attr("class", "form-group");
-	div.append("label").text(key);
+	div.append("label").attr("class", "control-label").text(key);
 	var s = div.append("select").attr("id", key)
 		.attr("class", "form-control");
 	for (var i = 0; i < val.length; i++) {
@@ -97,7 +96,18 @@ var params = _.mapObject(controlAttrs, function(val, key){
 			.attr("value", item);
 	};
 	return val[0];
-})
+});
+// DOM for showing text input
+var div = controlers.append("div")
+	.attr("class", "form-group");
+div.append("label").attr("class", "control-label")
+	.text("Show node label");
+div.append("span").text(" ");
+div.append("input")
+	.attr("id", "show_text")
+	.attr("type", "checkbox")
+	.property("checked", true);
+
 // default params
 console.log(params);
 
@@ -106,7 +116,7 @@ var tooltip = d3.select("body").append("div")
 	.attr("class", "tooltip")
 	.style("opacity", 0);
 
-svg.style("cursor","move");
+// svg.style("cursor","move");
 
 var graph_fn = "data/harvard_net_with_pos.json";
 d3.json(graph_fn, function(error, graph) {
@@ -349,6 +359,19 @@ d3.json(graph_fn, function(error, graph) {
 		var colorAttr = d3.select("#colorAttr").property("value");
 		var sizeAttr = d3.select("#sizeAttr").property("value");		
 		redraw(shapeAttr, colorAttr, sizeAttr)
+	})
+
+	d3.select("#show_text").on("change", function(){
+		// controling whether to show text labels
+		var show_text = d3.select(this).property("checked");
+		text.attr("display", function(){
+			if (show_text) {
+				var currentScale = d3.transform(g.attr("transform")).scale[0];
+				return currentScale > text_display_scale ? "default" : "none";	
+			} else {
+				return "none";
+			}
+		});
 	})
 
 	// console.log(error)
