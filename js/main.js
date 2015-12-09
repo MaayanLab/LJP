@@ -330,38 +330,7 @@ d3.json(graph_fn, function(error, graph) {
 		});
 
 		// 4. update zoom
-		zoom.on("zoom", function() {
-			var stroke = nominal_stroke;
-			if (nominal_stroke*zoom.scale()>max_stroke) stroke = max_stroke/zoom.scale();
-			// link.style("stroke-width",stroke);
-			circle.style("stroke-width",stroke);
-
-			var base_radius = nominal_base_node_size;
-			if (nominal_base_node_size*zoom.scale()>max_base_node_size) base_radius = max_base_node_size/zoom.scale();
-			circle.attr("d", d3.svg.symbol()
-				.size(function(d) { return Math.PI*Math.pow(size(d[sizeAttr])*base_radius/nominal_base_node_size||base_radius,2); })
-				.type(function(d) { return shape(d[shapeAttr]); })
-				)
-				
-			if (!text_center) text.attr("dx", function(d) { return (size(d[sizeAttr])*base_radius/nominal_base_node_size||base_radius); });
-			
-			var text_size = nominal_text_size;
-			if (nominal_text_size*zoom.scale()>max_text_size) text_size = max_text_size/zoom.scale();
-			text.style("font-size",text_size + "px");
-
-			// display text if the currentScale is large
-			var show_text = d3.select("#show_text").property("checked");
-			if (show_text) {
-				var currentScale = d3.transform(g.attr("transform")).scale[0];
-				text.attr("display", function(){
-					return currentScale > text_display_scale ? "default" : "none";
-				});
-			} else {
-				text.attr("display", "none");
-			};
-
-			g.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
-		});
+		zoom.on("zoom", zoomed);
 
 		svg.call(zoom);	 		
 
@@ -414,7 +383,73 @@ d3.json(graph_fn, function(error, graph) {
 		svg.attr("width", width).attr("height", height);
 		w = width;
 		h = height;
-	}
+	};
+
+	function zoomed() {
+		var stroke = nominal_stroke;
+		if (nominal_stroke*zoom.scale()>max_stroke) stroke = max_stroke/zoom.scale();
+		// link.style("stroke-width",stroke);
+		circle.style("stroke-width",stroke);
+
+		var base_radius = nominal_base_node_size;
+		if (nominal_base_node_size*zoom.scale()>max_base_node_size) base_radius = max_base_node_size/zoom.scale();
+		circle.attr("d", d3.svg.symbol()
+			.size(function(d) { return Math.PI*Math.pow(size(d[sizeAttr])*base_radius/nominal_base_node_size||base_radius,2); })
+			.type(function(d) { return shape(d[shapeAttr]); })
+			)
+			
+		if (!text_center) text.attr("dx", function(d) { return (size(d[sizeAttr])*base_radius/nominal_base_node_size||base_radius); });
+		
+		var text_size = nominal_text_size;
+		if (nominal_text_size*zoom.scale()>max_text_size) text_size = max_text_size/zoom.scale();
+		text.style("font-size",text_size + "px");
+
+		// display text if the currentScale is large
+		var show_text = d3.select("#show_text").property("checked");
+		if (show_text) {
+			var currentScale = d3.transform(g.attr("transform")).scale[0];
+			text.attr("display", function(){
+				return currentScale > text_display_scale ? "default" : "none";
+			});
+		} else {
+			text.attr("display", "none");
+		};
+
+		g.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+	};
+
+	// zoom in/out buttons
+	var btnGroup = controlers.append("div")
+		.attr("class", "btn-group-xs")
+		.attr("role", "group");
+
+	btnGroup.append("button")
+		.attr("class", "btn btn-default")
+		.on("click", function(){ zoomByFactor(1.2) })
+		.append("span")
+			.attr("class", "glyphicon glyphicon-zoom-in");
+	btnGroup.append("button")
+		.attr("class", "btn btn-default")
+		.on("click", function(){ zoomByFactor(0.8) })
+		.append("span")
+			.attr("class", "glyphicon glyphicon-zoom-out");
+
+	function zoomByFactor(factor){ // for zooming svg after button click
+		var scale = d3.transform(g.attr("transform")).scale[0];;
+		var extent = [min_zoom,max_zoom];
+		var newScale = scale * factor;
+		if (extent[0] <= newScale && newScale <= extent[1]) {
+			var t = zoom.translate();
+			var c = [w / 2, h / 2];
+			zoom.scale(newScale)
+				.translate(
+				[c[0] + (t[0] - c[0]) / scale * newScale, 
+				c[1] + (t[1] - c[1]) / scale * newScale])
+				.event(svg.transition().duration(350));
+		}
+	};
+
+
 
 });// end of d3.json(graph_fn) block
 
