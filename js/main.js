@@ -62,7 +62,7 @@ var max_base_node_size = 36;
 
 var text_display_scale = 3;
 var min_zoom = 0.1;
-var max_zoom = 7;
+var max_zoom = 20;
 var svg = d3.select("#svg_container").append("svg");
 var zoom = d3.behavior.zoom().scaleExtent([min_zoom,max_zoom])
 var g = svg.append("g");
@@ -133,6 +133,7 @@ d3.json(graph_fn, function(error, graph) {
 	var shapeAttr = params.shapeAttr,
 		sizeAttr = params.sizeAttr,
 		colorAttr = params.colorAttr;
+	var show_text = true;	
 
 	// get uniq_categories for shapes
 	var uniq_categories = _.uniq(_.map(graph.nodes, function(d){ return d[shapeAttr]}));
@@ -251,11 +252,11 @@ d3.json(graph_fn, function(error, graph) {
 
 
 	if (text_center)
-		text.text(function(d) { return d.id; })
+		text.text(function(d) { return d["DrugName"]; })
 	.style("text-anchor", "middle");
 	else 
 		text.attr("dx", function(d) {return (size(d[sizeAttr])||nominal_base_node_size);})
-	.text(function(d) { return '\u2002'+d.id; });
+	.text(function(d) { return '\u2002'+d["DrugName"]; });
 
 
 	resize();
@@ -349,10 +350,15 @@ d3.json(graph_fn, function(error, graph) {
 			text.style("font-size",text_size + "px");
 
 			// display text if the currentScale is large
-			var currentScale = d3.transform(g.attr("transform")).scale[0];
-			text.attr("display", function(){
-				return currentScale > text_display_scale ? "default" : "none";
-			});
+			var show_text = d3.select("#show_text").property("checked");
+			if (show_text) {
+				var currentScale = d3.transform(g.attr("transform")).scale[0];
+				text.attr("display", function(){
+					return currentScale > text_display_scale ? "default" : "none";
+				});
+			} else {
+				text.attr("display", "none");
+			};
 
 			g.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
 		});
