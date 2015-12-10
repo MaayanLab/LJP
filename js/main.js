@@ -419,15 +419,16 @@ d3.json(graph_fn, function(error, graph) {
 	};
 
 	// zoom in/out buttons
-	var btnGroup = controlers.append("div")
-		.attr("class", "btn-group-xs")
-		.attr("role", "group");
+	var btnGroup = controlers.append("div");
 
 	btnGroup.append("button")
 		.attr("class", "btn btn-default")
 		.on("click", function(){ zoomByFactor(1.2) })
 		.append("span")
 			.attr("class", "glyphicon glyphicon-zoom-in");
+	
+	btnGroup.append("span").text("  ");
+			
 	btnGroup.append("button")
 		.attr("class", "btn btn-default")
 		.on("click", function(){ zoomByFactor(0.8) })
