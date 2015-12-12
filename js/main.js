@@ -76,7 +76,7 @@ var controlAttrs = {
 'Epigenomics_Roadmap_HM_ChIP-seq|dn', 
 'ENCODE_TF_ChIP-seq_2015|dn', 
 'GO_Biological_Process_2015|dn', 
-		
+
 		],
 	sizeAttr: ["GRvalue", "-logPvalue", "Time", "Conc"],
 }
@@ -157,7 +157,8 @@ var tooltip = d3.select("body").append("div")
 // svg.style("cursor","move");
 
 // var graph_fn = "data/harvard_net_with_pos.json";
-var graph_fn = "data/harvard_net_with_pos_enriched_terms.json"
+// var graph_fn = "data/harvard_net_with_pos_enriched_terms.json";
+var graph_fn = "data/harvard_net_with_pos_Cidx_enriched_terms.json";
 d3.json(graph_fn, function(error, graph) {
 	// to get the extent of x and y from the data
 	x.domain(d3.extent(graph.nodes, function(d) { return d.position.x; })).nice();
