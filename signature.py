@@ -1,4 +1,5 @@
 import numpy as np
+from scipy.stats import fisher_exact
 import json
 from pymongo import MongoClient
 client = MongoClient('mongodb://10.91.53.225:27017/')

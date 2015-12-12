@@ -70,8 +70,10 @@ gmt_names = [
 	'GO_Biological_Process_2015',
 ]
 
+rank_cutoff = 5
+
 for gmt_name in gmt_names:
-	print gmt_names
+	print gmt_name
 	d_gmt = read_gmt(GMT_FILE_ROOT + '%s.gmt' % gmt_name)
 	for key, genes in d_gmt.items():
 		d_gmt[key] = set(genes)
@@ -83,12 +85,12 @@ for gmt_name in gmt_names:
 	dn_pval_mat = np.loadtxt('../dn_pval_mat_%s.txt' % gmt_name)
 
 	## find top enriched term for each sig_id and bind them to G
-	d_sig_id_terms = get_top_enriched_term(up_pval_mat, d_gmt, sig_ids, pval_cutoff=pval_cutoff)
+	d_sig_id_terms = get_top_enriched_term(up_pval_mat, d_gmt, sig_ids, pval_cutoff=pval_cutoff, rank_cutoff=rank_cutoff)
 	key = gmt_name + '|up'
 	for sig_id, term in d_sig_id_terms.items():
 		G.node[sig_id][key] = term
 
-	d_sig_id_terms = get_top_enriched_term(dn_pval_mat, d_gmt, sig_ids, pval_cutoff=pval_cutoff)
+	d_sig_id_terms = get_top_enriched_term(dn_pval_mat, d_gmt, sig_ids, pval_cutoff=pval_cutoff, rank_cutoff=rank_cutoff)
 	key = gmt_name + '|dn'
 	for sig_id, term in d_sig_id_terms.items():
 		G.node[sig_id][key] = term
@@ -96,3 +98,5 @@ for gmt_name in gmt_names:
 ## output network
 data = json_graph.node_link_data(G)
 json.dump(data, open('../harvard_net_with_pos_enriched_terms.json', 'wb'))
+json.dump(data, open('data/harvard_net_with_pos_enriched_terms.json', 'wb'))
+

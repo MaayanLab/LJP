@@ -8,7 +8,7 @@ import cPickle as pickle
 from collections import OrderedDict
 import numpy as np
 import pandas as pd
-from scipy.stats import fisher_exact
+
 
 sys.path.append('/Users/zichen/Documents/bitbucket/maayanlab_utils')
 from RNAseq import enrichr_result
@@ -51,14 +51,15 @@ print len(d_sig_objs)
 
 # gmt_name = 'ChEA'
 # gmt_name = 'KEGG_2015'
-# gmt_name = 'KEA_2015'
+gmt_name = 'KEA_2015'
 # gmt_name = 'MGI_Mammalian_Phenotype_Level_4'
 # gmt_name = 'Epigenomics_Roadmap_HM_ChIP-seq'
 # gmt_name = 'ENCODE_TF_ChIP-seq_2015'
-gmt_name = 'GO_Biological_Process_2015'
+# gmt_name = 'GO_Biological_Process_2015'
 
 d_gmt = read_gmt(GMT_FILE_ROOT + '%s.gmt' % gmt_name)
 for key, genes in d_gmt.items():
+	genes = [g.split(',')[0] for g in genes]
 	d_gmt[key] = set(genes)
 
 pval_cutoff = 0.05/len(d_gmt)
