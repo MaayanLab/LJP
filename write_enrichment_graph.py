@@ -75,7 +75,7 @@ def get_consensus_enriched_terms(pval_mat, d_gmt, sig_ids, d_group_idx):
 	for group, idx in d_group_idx.items():
 		sub_rank_mat = rank_mat[idx,:]
 		rp = np.prod(sub_rank_mat, axis=0) # rank product for each terms
-		topterm = terms[rp.argsort()][0]
+		topterm = ','.join(terms[rp.argsort()][0:3])
 		for i in idx:
 			sig_id = sig_ids[i]
 			d_sig_id_topterm[sig_id] = topterm

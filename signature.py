@@ -1,6 +1,11 @@
 import numpy as np
+import pandas as pd
 from scipy.stats import fisher_exact
 import json
+import cookielib, poster, urllib2
+import requests
+from time import sleep
+
 from pymongo import MongoClient
 # client = MongoClient('mongodb://10.91.53.225:27017/')
 # db = client['LJP2014']
@@ -22,6 +27,23 @@ def fisherp(s1, s2, universe=22000):
 	else:
 		_, pval = fisher_exact([[a,b], [c,universe]])
 	return pval
+
+
+def post_to_enrichr(genes):
+	cj = cookielib.CookieJar()
+	opener = poster.streaminghttp.register_openers()
+	opener.add_handler(urllib2.HTTPCookieProcessor(cookielib.CookieJar()))
+	genesStr = '\n'.join(genes)
+
+	params = {'list':genesStr,'description':''}
+	datagen, headers = poster.encode.multipart_encode(params)
+
+	url = "http://amp.pharm.mssm.edu/Enrichr/enrich"
+	request = urllib2.Request(url, datagen, headers)
+	urllib2.urlopen(request)
+	sleep(2) ## for some reason it works
+	return
+
 
 
 class Signature(object):
@@ -67,3 +89,34 @@ class Signature(object):
 
 		return up_pvals, dn_pvals
 
+	def enrichr(self, gmts):
+		## enrichment using Enrichr against a list of gmts
+		res_up = {}
+		res_dn = {}
+		if len(self.up_genes) > 0:
+			post_to_enrichr(self.up_genes)
+			for gmt in gmts:
+				x = urllib2.urlopen("http://amp.pharm.mssm.edu/Enrichr/enrich?backgroundType=" + gmt)
+				response_dict = json.loads(x.read())
+				df = pd.DataFrame.from_records(response_dict[gmt], columns=['rank', 'term', 'pval', 'zs', 'combined', 'overlap', 'fdr'],
+					exclude=['overlap', 'fdr'], index='rank')
+				res_up[gmt] = df
+		if len(self.dn_genes) > 0:
+			post_to_enrichr(self.dn_genes)
+			for gmt in gmts:
+				x = urllib2.urlopen("http://amp.pharm.mssm.edu/Enrichr/enrich?backgroundType=" + gmt)
+				response_dict = json.loads(x.read())
+				df = pd.DataFrame.from_records(response_dict[gmt], columns=['rank', 'term', 'pval', 'zs', 'combined', 'overlap', 'fdr'],
+					exclude=['overlap', 'fdr'], index='rank')
+				res_dn[gmt] = df			
+		return res_up, res_dn
+
+# from pprint import pprint
+# import cPickle as pickle
+# d_sig_objs = pickle.load(open('../d_sig_objs.pkl', 'rb'))
+# sig = d_sig_objs.values()[1]
+# print len(sig.up_genes)
+# from time import time
+# t = time()
+# res_up, res_dn = sig.enrichr(['ChEA_2015', 'KEA_2015'])
+# print time() - t
