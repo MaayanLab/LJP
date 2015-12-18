@@ -62,14 +62,14 @@ var controlAttrs = {
 	shapeAttr: ["CellLine", 'Time', "Conc"],
 	colorAttr: ["DrugClass","Cidx", "CellLine", "pathway_role", "cellular_function", "Conc", "Time",
 		"GRvalue", "-logPvalue",
-'ChEA|up', 
+'ChEA_2015|up', 
 'KEGG_2015|up', 
 'KEA_2015|up', 
 'MGI_Mammalian_Phenotype_Level_4|up', 
 'Epigenomics_Roadmap_HM_ChIP-seq|up', 
 'ENCODE_TF_ChIP-seq_2015|up', 
 'GO_Biological_Process_2015|up', 
-'ChEA|dn', 
+'ChEA_2015|dn', 
 'KEGG_2015|dn', 
 'KEA_2015|dn', 
 'MGI_Mammalian_Phenotype_Level_4|dn', 
@@ -158,7 +158,8 @@ var tooltip = d3.select("body").append("div")
 
 // var graph_fn = "data/harvard_net_with_pos.json";
 // var graph_fn = "data/harvard_net_with_pos_enriched_terms.json";
-var graph_fn = "data/harvard_net_with_pos_Cidx_enriched_terms.json";
+// var graph_fn = "data/harvard_net_with_pos_Cidx_enriched_terms.json";
+var graph_fn = "data/harvard_net_with_pos_Cidx_enriched_terms_combined_score.json";
 d3.json(graph_fn, function(error, graph) {
 	// to get the extent of x and y from the data
 	x.domain(d3.extent(graph.nodes, function(d) { return d.position.x; })).nice();

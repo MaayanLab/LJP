@@ -65,6 +65,18 @@ def get_grouped_index(G, group_by, sig_ids):
 		d_group_idx[attr].append(idx)	
 	return d_group_idx
 
+def get_grouped_sigids(G, group_by):
+	## get a dict where key is the unique groups and vals are list of sig_ids
+	attrs = [d[group_by] for n, d in G.nodes(data=True)]
+	sig_ids = G.nodes()
+	d_group_sigids = {}
+	for attr, sig_id in zip(attrs, sig_ids):
+		if attr not in d_group_sigids:
+			d_group_sigids[attr] = []
+		d_group_sigids[attr].append(sig_id)	
+	return d_group_sigids
+
+
 def get_consensus_enriched_terms(pval_mat, d_gmt, sig_ids, d_group_idx):
 	## get consensus enriched terms for groups of signatures using rank product
 	d_sig_id_topterm = {}
@@ -79,8 +91,25 @@ def get_consensus_enriched_terms(pval_mat, d_gmt, sig_ids, d_group_idx):
 		for i in idx:
 			sig_id = sig_ids[i]
 			d_sig_id_topterm[sig_id] = topterm
-
 	return d_sig_id_topterm
+
+def get_consensus_enriched_terms2(df, d_group_sigids):
+	## expect taking the dataframe of terms x sig_ids
+	d_sig_id_topterm = {}
+	terms = np.array(df.index.tolist())
+	sig_ids_in_df = df.columns.tolist()
+
+	rank_mat = df.rank(axis=0, na_option='bottom', ascending=False).values
+	for group, sig_ids in d_group_sigids.items():
+		idx = np.in1d(sig_ids_in_df, sig_ids)
+		sub_rank_mat = rank_mat[:, idx]
+		idx = np.where(idx)[0] # convert bool index to number index
+		rp = np.prod(sub_rank_mat, axis=1) # rank product for each terms
+		topterm = ', '.join(terms[rp.argsort()][0:2])
+		print group, topterm
+		for sig_id in sig_ids:
+			d_sig_id_topterm[sig_id] = topterm	
+	return d_sig_id_topterm	
 
 data = json.load(open('../harvard_net_with_pos.json','rb'))
 G = json_graph.node_link_graph(data)
@@ -91,11 +120,15 @@ sig_ids = d_sig_objs.keys()
 
 group_by = 'Cidx'
 ## get group index
-d_group_idx = get_grouped_index(G, group_by, sig_ids)
+# d_group_idx = get_grouped_index(G, group_by, sig_ids)
+## for Enrichr results:
+d_group_idx = get_grouped_sigids(G, group_by)
 
+## get enrichr merged results
+d_all_result = pickle.load(open('../Enrichr_d_all_results_combined_score.pkl', 'rb'))
 
 gmt_names = [
-	'ChEA',
+	'ChEA_2015',
 	'KEGG_2015',
 	'KEA_2015',
 	'MGI_Mammalian_Phenotype_Level_4',
@@ -108,33 +141,39 @@ rank_cutoff = 5
 
 for gmt_name in gmt_names:
 	print gmt_name
-	d_gmt = read_gmt(GMT_FILE_ROOT + '%s.gmt' % gmt_name)
-	for key, genes in d_gmt.items():
-		d_gmt[key] = set(genes)
-	terms = d_gmt.keys()
-	pval_cutoff = 0.05/len(d_gmt)
+	# d_gmt = read_gmt(GMT_FILE_ROOT + '%s.gmt' % gmt_name)
+	# for key, genes in d_gmt.items():
+	# 	d_gmt[key] = set(genes)
+	# terms = d_gmt.keys()
+	# pval_cutoff = 0.05/len(d_gmt)
 
 	## load enrichment p-value matrices
-	up_pval_mat = np.loadtxt('../up_pval_mat_%s.txt' % gmt_name)
-	dn_pval_mat = np.loadtxt('../dn_pval_mat_%s.txt' % gmt_name)
+	# up_pval_mat = np.loadtxt('../up_pval_mat_%s.txt' % gmt_name)
+	# dn_pval_mat = np.loadtxt('../dn_pval_mat_%s.txt' % gmt_name)
+	up_val_df = d_all_result[gmt_name + '-up']
+	dn_val_df = d_all_result[gmt_name + '-dn']
 
 	## find top enriched term for each sig_id and bind them to G
 	# d_sig_id_terms = get_top_enriched_term(up_pval_mat, d_gmt, sig_ids, pval_cutoff=pval_cutoff, rank_cutoff=rank_cutoff)
-	d_sig_id_terms = get_consensus_enriched_terms(up_pval_mat, d_gmt, sig_ids, d_group_idx)
+	# d_sig_id_terms = get_consensus_enriched_terms(up_pval_mat, d_gmt, sig_ids, d_group_idx)
+	d_sig_id_terms = get_consensus_enriched_terms2(up_val_df, d_group_idx)
 	key = gmt_name + '|up'
 	for sig_id, term in d_sig_id_terms.items():
 		G.node[sig_id][key] = term
 
 	# d_sig_id_terms = get_top_enriched_term(dn_pval_mat, d_gmt, sig_ids, pval_cutoff=pval_cutoff, rank_cutoff=rank_cutoff)
-	d_sig_id_terms = get_consensus_enriched_terms(dn_pval_mat, d_gmt, sig_ids, d_group_idx)
+	# d_sig_id_terms = get_consensus_enriched_terms(dn_pval_mat, d_gmt, sig_ids, d_group_idx)
+	d_sig_id_terms = get_consensus_enriched_terms2(dn_val_df, d_group_idx)
 	key = gmt_name + '|dn'
 	for sig_id, term in d_sig_id_terms.items():
 		G.node[sig_id][key] = term
+
+
 
 ## output network
 data = json_graph.node_link_data(G)
 # json.dump(data, open('../harvard_net_with_pos_enriched_terms.json', 'wb'))
 # json.dump(data, open('data/harvard_net_with_pos_enriched_terms.json', 'wb'))
 
-json.dump(data, open('../harvard_net_with_pos_Cidx_enriched_terms.json', 'wb'))
-json.dump(data, open('data/harvard_net_with_pos_Cidx_enriched_terms.json', 'wb'))
+json.dump(data, open('../harvard_net_with_pos_Cidx_enriched_terms_combined_score.json', 'wb'))
+json.dump(data, open('data/harvard_net_with_pos_Cidx_enriched_terms_combined_score.json', 'wb'))
