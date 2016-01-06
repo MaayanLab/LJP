@@ -2,7 +2,7 @@
 Flask app handling enrichment against LJP data from user input up/dn gene sets and/or signatures
 '''
 import os, sys
-from flask import Flask, request
+from flask import Flask, request, redirect
 
 from orm import *
 
@@ -27,24 +27,27 @@ def enrich():
 	if request.method == 'POST': 
 		# data = json.loads(request.data)
 		if request.form['method'] == 'geneSet':
-			up_genes = request.form['upGenes'].split('\n')
-			dn_genes = request.form['dnGenes'].split('\n')
+			up_genes = request.form['upGenes'].split()
+			dn_genes = request.form['dnGenes'].split()
+			print up_genes
+			print dn_genes
 			user_input = GeneSets(up_genes, dn_genes)
 		elif request.form['method'] == 'CD':
-			genes_vals = request.form['signature'].split('\n')
+			genes_vals = request.form['signature'].split()
 			genes = []
 			vals = []
 			for gv in genes_vals:
 				gene, val = gv.split(',')
 				genes.append(gene)
 				vals.append(float(val))
+			print genes
 			user_input = Signature(genes, vals)
 
 		## POST to SigineLJP to do the enrichment 
 		res = user_input.enrich()
 		## save user input and enrichment results to db and get a result id
 		rid = user_input.save()
-	return rid
+	return redirect(ENTER_POINT + '/#result/' + rid, code=302)
 
 @app.route(ENTER_POINT + '/result', methods=['GET'])
 def result():

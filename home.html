@@ -1,0 +1,55 @@
+<div class="row">
+	<div class="col-xs-6">
+		<form id="geneSet" method="post" action="/LJP/enrich">
+			<input type="hidden" name="method" value="geneSet">
+
+			<label for="upGenes">Up genes</label>
+			<textarea name="upGenes" rows="10" required></textarea>
+
+			<label for="dnGenes">Down genes</label>
+			<textarea name="dnGenes" rows="10" required></textarea>
+			<button id="example1">Example1</button>
+
+			<input type="submit" value="Submit"/>
+		</form>
+	</div>
+
+	<div class="col-xs-6">
+		<form id="CD" method="post" action="/LJP/enrich">
+			<input type="hidden" name="method" value="CD">
+
+			<label for="signature">Signature</label>
+			<textarea name="signature" rows="10" required></textarea>
+
+			<button id="example2">Example2</button>
+			<input type="submit" value="Submit"/>
+		</form>
+	</div>
+</div>
+<script>
+$("#example1").click(function(e){
+	e.preventDefault();
+	d3.json("test/ebovs_crispy_old.json", function(data){
+		data = data['ebov30min'];
+		$("[name=upGenes]").text(data['up'].join('\n'));
+		$("[name=dnGenes]").text(data['dn'].join('\n'));
+	})
+
+})
+
+$("#example2").click(function(e){
+	e.preventDefault();
+	d3.json("test/ebovs.json", function(data){
+		data = data['ebov30min'];
+		var signatureStr = '';
+		for (var i = 0; i < data['vals'].length; i++) {
+			var val = data['vals'][i]
+			var gene = data['genes'][i]
+			signatureStr += gene + ',' + val + '\n';
+		};
+		$("[name=signature]").text(signatureStr);
+	})
+
+})
+
+</script>

@@ -43,7 +43,7 @@ function convertName (name) {
 // for controls and display of nodes
 var controlAttrs = {
 	shapeAttr: ["CellLine", 'Time', "Conc"],
-	colorAttr: ["DrugClass","Cidx", "CellLine", "pathway_role", "cellular_function", "Conc", "Time",
+	colorAttr: ["Enrichment score", "DrugClass","Cidx", "CellLine", "pathway_role", "cellular_function", "Conc", "Time",
 		"GRvalue", "-logPvalue"],
 	sizeAttr: ["GRvalue", "-logPvalue", "Time", "Conc"],
 }
@@ -123,8 +123,12 @@ var tooltip = d3.select("body").append("div")
 
 // svg.style("cursor","move");
 
-var graph_fn = "data/harvard_net_with_pos.json";
-d3.json(graph_fn, function(error, graph) {
+// get rid from the URL
+// seems hacky and may need to change
+var rid = window.location.href.split('/').slice(-1).pop()
+console.log(rid)
+
+d3.json('/LJP/result?id=' + rid, function(error, graph) {
 	// to get the extent of x and y from the data
 	x.domain(d3.extent(graph.nodes, function(d) { return d.position.x; })).nice();
 	y.domain(d3.extent(graph.nodes, function(d) { return d.position.y; })).nice();
@@ -137,7 +141,7 @@ d3.json(graph_fn, function(error, graph) {
 
 	// get uniq_categories for shapes
 	var uniq_categories = _.uniq(_.map(graph.nodes, function(d){ return d[shapeAttr]}));
-	console.log(uniq_categories);
+	// console.log(uniq_categories);
 
 	var shape = d3.scale.ordinal()
 		.domain(uniq_categories)
@@ -148,24 +152,28 @@ d3.json(graph_fn, function(error, graph) {
 		.range(_.map(d3.svg.symbolTypes, function(t) { return d3.svg.symbol().type(t)(); }));
 	
 	// get uniq_categories for colors
-	if (colorAttr === 'GRvalue' ||  colorAttr === '-logPvalue'){ // color by continuous variable 
+	if (colorAttr === 'GRvalue' ||  colorAttr === '-logPvalue' || colorAttr === 'Enrichment score'){ // color by continuous variable 
 		var colorExtent = d3.extent(graph.nodes, function(d) { return d[colorAttr]; });
+		console.log("colorExtent:")
+		console.log(colorExtent)
 		var min_score = colorExtent[0],
 			max_score = colorExtent[1];
 		var color = d3.scale.linear()
-			.domain([min_score, (min_score+max_score)/2, max_score])
+			// .domain([min_score, (min_score+max_score)/2, max_score])
+			.domain([min_score, 0, max_score])
 			.range(["#1f77b4", "white", "#d62728"]);
 		var legendColor = d3.legend.color()
 			.title(colorAttr)
 			.shapeWidth(20)
 			.cells(5)
+			.labelFormat(d3.format(".2f"))
 			.scale(color);
 	} else{ // color by categorical variable
 		var uniq_categories2 = _.uniq(_.map(graph.nodes, function(d){ return d[colorAttr]}));
 		var range20 = [];
 		for (var i = 0; i != 20; ++i) range20.push(i)
 		var colors20 = d3.scale.category20()
-		console.log(uniq_categories2)
+		// console.log(uniq_categories2)
 		var color = d3.scale.ordinal()
 			.domain(uniq_categories2)
 			.range(_.map(range20, function(i){ return colors20(i); }))
@@ -180,7 +188,7 @@ d3.json(graph_fn, function(error, graph) {
 
 	// get extent for sizes	
 	var sizeExtent = d3.extent(graph.nodes, function(d){ return d[sizeAttr]});
-	console.log(sizeExtent);
+	// console.log(sizeExtent);
 	var size = d3.scale.linear()
 		.domain(sizeExtent)
 		.range([0.1,4])
@@ -269,24 +277,26 @@ d3.json(graph_fn, function(error, graph) {
 		shapeL.domain(uniq_categories);
 		
 		// get uniq_categories for colors
-		if (colorAttr === 'GRvalue' ||  colorAttr === '-logPvalue'){ // color by continuous variable 
+		if (colorAttr === 'GRvalue' ||  colorAttr === '-logPvalue'|| colorAttr === 'Enrichment score'){ // color by continuous variable 
 			var colorExtent = d3.extent(graph.nodes, function(d) { return d[colorAttr]; });
 			var min_score = colorExtent[0],
 				max_score = colorExtent[1];
 			var color = d3.scale.linear()
-				.domain([min_score, (min_score+max_score)/2, max_score])
+				// .domain([min_score, (min_score+max_score)/2, max_score])
+				.domain([min_score, 0, max_score])
 				.range(["#1f77b4", "white", "#d62728"]);
 			var legendColor = d3.legend.color()
 				.title(colorAttr)
 				.shapeWidth(20)
 				.cells(5)
+				.labelFormat(d3.format(".2f"))
 				.scale(color);
 		} else{ // color by categorical variable
 			var uniq_categories2 = _.uniq(_.map(graph.nodes, function(d){ return d[colorAttr]}));
 			var range20 = [];
 			for (var i = 0; i != 20; ++i) range20.push(i)
 			var colors20 = d3.scale.category20()
-			console.log(uniq_categories2)
+			// console.log(uniq_categories2)
 			var color = d3.scale.ordinal()
 				.domain(uniq_categories2)
 				.range(_.map(range20, function(i){ return colors20(i); }))
