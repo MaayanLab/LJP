@@ -272,9 +272,13 @@ d3.json('/LJP/result?id=' + rid, function(error, graph) {
 			console.log(colorExtent)
 			var min_score = colorExtent[0],
 				max_score = colorExtent[1];
+			if (min_score * max_score < 0) { // min_score < 0 ; max_score > 0
+				var center_score = 0; 
+			} else{
+				var center_score = (min_score+max_score)/2; 
+			};
 			color = d3.scale.linear()
-				// .domain([min_score, (min_score+max_score)/2, max_score])
-				.domain([min_score, 0, max_score])
+				.domain([min_score, center_score, max_score])
 				.range(["#1f77b4", "white", "#d62728"]);
 			legendColor = d3.legend.color()
 				.title(colorAttr)
