@@ -57,7 +57,7 @@ var outline = false;
 var nominal_base_node_size = 2;
 var nominal_text_size = 2;
 var max_text_size = 24;
-var nominal_stroke = 1.5;
+var nominal_stroke = 0.5;
 var max_stroke = 4.5;
 var max_base_node_size = 36;
 
@@ -134,6 +134,12 @@ d3.json('/LJP/result?id=' + rid, function(error, graph) {
 	x.domain(d3.extent(graph.nodes, function(d) { return d.position.x; })).nice();
 	y.domain(d3.extent(graph.nodes, function(d) { return d.position.y; })).nice();
 
+	// sort nodes by Enrichment scores to get top and bottom 5 sigIds
+	var sortedSigIds = _.map(_.sortBy(graph.nodes, 'Enrichment score'), function(d){ return d.id; });
+	var bottomSigIds = sortedSigIds.slice(0,5),
+		topSigIds = sortedSigIds.slice(-5);
+	sortedSigIds = null;
+
 	// get default params
 	var shapeAttr = params.shapeAttr,
 		sizeAttr = params.sizeAttr,
@@ -169,6 +175,7 @@ d3.json('/LJP/result?id=' + rid, function(error, graph) {
 				.style("opacity", 0);
 		});
 
+
 	var circle = node.append("path")
 	.attr("d", d3.svg.symbol()
 		.size(function(d) { return Math.PI*Math.pow(size(d[sizeAttr])||nominal_base_node_size,2); })
@@ -178,12 +185,14 @@ d3.json('/LJP/result?id=' + rid, function(error, graph) {
 		return color(d[colorAttr]);
 	})
 	.style("stroke-width", nominal_stroke)
+	// .style("z-index", "0")
 	.style("strok", "black");
 
 
 	var text = node.append("text")
 	.attr("dy", ".35em")
 	.style("font-size", nominal_text_size + "px")
+	// .style("z-index", "1")
 	.attr("display", function(){
 		var currentScale = d3.transform(g.attr("transform")).scale[0];
 		return currentScale > text_display_scale ? "default" : "none";
@@ -204,7 +213,7 @@ d3.json('/LJP/result?id=' + rid, function(error, graph) {
 	zoom.on("zoom", zoomed);
 	svg.call(zoom);	
 
-	// for controls
+	// for controlers
 	d3.selectAll("select").on("change", function(){
 		// get new params from select
 		var shapeAttr = d3.select("#shapeAttr").property("value"); 
@@ -242,6 +251,8 @@ d3.json('/LJP/result?id=' + rid, function(error, graph) {
 		.on("click", function(){ zoomByFactor(0.8) })
 		.append("span")
 			.attr("class", "glyphicon glyphicon-zoom-out");
+
+
 
 	// functions below
 	function setUpScales(shapeAttr, colorAttr, sizeAttr) {
@@ -361,6 +372,38 @@ d3.json('/LJP/result?id=' + rid, function(error, graph) {
 		h = height;
 	};
 
+	highlightNodes(topSigIds, bottomSigIds);
+
+	function highlightNodes(topSigIds, bottomSigIds) {
+		// Highlight two array of nodes based on their id
+		sigIds = topSigIds.concat(bottomSigIds);
+		circle.style("stroke", function(d){
+			if (sigIds.indexOf(d.id) !== -1) { return "black"; } 
+			else{ return "none" };
+		});
+
+		text.attr("display", function(d){
+			if (sigIds.indexOf(d.id) !== -1) { // is in sigIds
+				return "default";
+			} else{
+				var currentDisplay = d3.select(this).attr("display");
+				return currentDisplay;
+			};
+		})
+		// .style("z-index", function(d){
+		// 	if (sigIds.indexOf(d.id) !== -1) { return "1"; }
+		// 	else { return "-1"}
+		// })
+		.style("font-size", function(d){
+			if (sigIds.indexOf(d.id) !== -1) { return "10px"; } 
+			else{ return nominal_text_size+"px"; }
+		}).style("fill", function(d){
+			if (topSigIds.indexOf(d.id) !== -1) { return "red"; } 
+			if (bottomSigIds.indexOf(d.id) !== -1) { return "blue"; } 
+		});
+
+	};
+
 	function zoomed() {
 		var stroke = nominal_stroke;
 		if (nominal_stroke*zoom.scale()>max_stroke) stroke = max_stroke/zoom.scale();
@@ -390,6 +433,8 @@ d3.json('/LJP/result?id=' + rid, function(error, graph) {
 		} else {
 			text.attr("display", "none");
 		};
+		// highlight nodes
+		highlightNodes(topSigIds, bottomSigIds);
 
 		g.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
 	};
