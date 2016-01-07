@@ -1,29 +1,40 @@
 <div class="row">
-	<div class="col-xs-6">
-		<form id="geneSet" method="post" action="/LJP/enrich">
-			<input type="hidden" name="method" value="geneSet">
+	<div class="col-sm-10 col-sm-offset-1">
+		<div class="alert alert-info">Search for LJP signatures using up/down gene sets or signature.</div>
+		<div class="col-xs-5">
+			<form class="form-horizontal" id="geneSet" method="post" action="/LJP/enrich">
+				<input type="hidden" name="method" value="geneSet">
 
-			<label for="upGenes">Up genes</label>
-			<textarea name="upGenes" rows="10" required></textarea>
+				<div class="form-group">
+					<label for="upGenes" class="controal-label">Up genes</label>
+					<textarea name="upGenes" rows="10" class="form-control" required></textarea>
+				</div>
+				
+				<div class="form-group">
+					<label for="dnGenes" class="controal-label">Down genes</label>
+					<textarea name="dnGenes" rows="10" class="form-control" required></textarea>
+				</div>
 
-			<label for="dnGenes">Down genes</label>
-			<textarea name="dnGenes" rows="10" required></textarea>
-			<button id="example1">Example1</button>
+				<button class="btn btn-default" id="example1">Gene set example</button>
+				<input class="btn btn-info" type="submit" value="Search"/>
+			</form>
+		</div>
 
-			<input type="submit" value="Submit"/>
-		</form>
-	</div>
+		<div class="col-xs-2"></div>
 
-	<div class="col-xs-6">
-		<form id="CD" method="post" action="/LJP/enrich">
-			<input type="hidden" name="method" value="CD">
+		<div class="col-xs-5">
+			<form class="form-horizontal" id="CD" method="post" action="/LJP/enrich">
+				<input type="hidden" name="method" value="CD">
 
-			<label for="signature">Signature</label>
-			<textarea name="signature" rows="10" required></textarea>
+				<div class="form-group">
+					<label for="signature" class="controal-label">Signature</label>
+					<textarea name="signature" rows="10" class="form-control" required></textarea>
+				</div>
 
-			<button id="example2">Example2</button>
-			<input type="submit" value="Submit"/>
-		</form>
+				<button class="btn btn-default" id="example2">Signature example</button>
+				<input class="btn btn-info" type="submit" value="Search"/>
+			</form>
+		</div>
 	</div>
 </div>
 <script>
