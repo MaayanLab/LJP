@@ -48,7 +48,8 @@ var controlAttrs = {
 	sizeAttr: ["GRvalue", "-logPvalue", "Time", "Conc"],
 }
 
-
+// continuous color attributes
+var colorAttrContinuous = ["Enrichment score", "GRvalue", "-logPvalue"];
 
 var text_center = false;
 var outline = false;
@@ -139,81 +140,12 @@ d3.json('/LJP/result?id=' + rid, function(error, graph) {
 		colorAttr = params.colorAttr;
 	var show_text = true;	
 
-	// get uniq_categories for shapes
-	var uniq_categories = _.uniq(_.map(graph.nodes, function(d){ return d[shapeAttr]}));
-	// console.log(uniq_categories);
+	// set up scales used to draw shape, color and size
+	setUpScales(shapeAttr, colorAttr, sizeAttr);
+	// draw legends
+	drawLegends();
 
-	var shape = d3.scale.ordinal()
-		.domain(uniq_categories)
-		.range(d3.svg.symbolTypes);
-	
-	var shapeL = d3.scale.ordinal() // used just for d3.legend
-		.domain(uniq_categories)
-		.range(_.map(d3.svg.symbolTypes, function(t) { return d3.svg.symbol().type(t)(); }));
-	
-	// get uniq_categories for colors
-	if (colorAttr === 'GRvalue' ||  colorAttr === '-logPvalue' || colorAttr === 'Enrichment score'){ // color by continuous variable 
-		var colorExtent = d3.extent(graph.nodes, function(d) { return d[colorAttr]; });
-		console.log("colorExtent:")
-		console.log(colorExtent)
-		var min_score = colorExtent[0],
-			max_score = colorExtent[1];
-		var color = d3.scale.linear()
-			// .domain([min_score, (min_score+max_score)/2, max_score])
-			.domain([min_score, 0, max_score])
-			.range(["#1f77b4", "white", "#d62728"]);
-		var legendColor = d3.legend.color()
-			.title(colorAttr)
-			.shapeWidth(20)
-			.cells(5)
-			.labelFormat(d3.format(".2f"))
-			.scale(color);
-	} else{ // color by categorical variable
-		var uniq_categories2 = _.uniq(_.map(graph.nodes, function(d){ return d[colorAttr]}));
-		var range20 = [];
-		for (var i = 0; i != 20; ++i) range20.push(i)
-		var colors20 = d3.scale.category20()
-		// console.log(uniq_categories2)
-		var color = d3.scale.ordinal()
-			.domain(uniq_categories2)
-			.range(_.map(range20, function(i){ return colors20(i); }))
-		var legendColor = d3.legend.color()
-			.title(colorAttr)
-			.shape("path", d3.svg.symbol().type("circle").size(30)())
-			.shapePadding(10)
-			.scale(color);
-	} 
-	svg.select("#legendColor")
-		.call(legendColor);
-
-	// get extent for sizes	
-	var sizeExtent = d3.extent(graph.nodes, function(d){ return d[sizeAttr]});
-	// console.log(sizeExtent);
-	var size = d3.scale.linear()
-		.domain(sizeExtent)
-		.range([0.1,4])
-		.nice();
-
-	// set up legend
-	// shape legend
-	var legendShape = d3.legend.symbol()
-		.scale(shapeL)
-		.orient("vertical")
-		.title(shapeAttr)
-	svg.select("#legendShape")
-		.call(legendShape);
-
-	var legendSize = d3.legend.size()
-		.scale(size)
-		.title(sizeAttr)
-		.cells(3)
-		.shape('circle')
-		.shapePadding(25)
-		.labelOffset(15)
-		.orient('horizontal');
-	svg.select("#legendSize")
-		.call(legendSize);
-
+	// draw the actural nodes of the network
 	// node is the wrapper of path and text for each nodes
 	var node = g.selectAll(".node")
 		.data(graph.nodes)
@@ -236,7 +168,6 @@ d3.json('/LJP/result?id=' + rid, function(error, graph) {
 				.duration(500)
 				.style("opacity", 0);
 		});
-
 
 	var circle = node.append("path")
 	.attr("d", d3.svg.symbol()
@@ -266,95 +197,21 @@ d3.json('/LJP/result?id=' + rid, function(error, graph) {
 		text.attr("dx", function(d) {return (size(d[sizeAttr])||nominal_base_node_size);})
 	.text(function(d) { return '\u2002'+d["DrugName"]; });
 
-
+	// resize the svg
 	resize();
 
+	// enabling zoom
+	zoom.on("zoom", zoomed);
+	svg.call(zoom);	
 
-	function redraw(shapeAttr, colorAttr, sizeAttr) {
-		// 1. update scales
-		var uniq_categories = _.uniq(_.map(graph.nodes, function(d){ return d[shapeAttr]}));
-		shape.domain(uniq_categories);
-		shapeL.domain(uniq_categories);
-		
-		// get uniq_categories for colors
-		if (colorAttr === 'GRvalue' ||  colorAttr === '-logPvalue'|| colorAttr === 'Enrichment score'){ // color by continuous variable 
-			var colorExtent = d3.extent(graph.nodes, function(d) { return d[colorAttr]; });
-			var min_score = colorExtent[0],
-				max_score = colorExtent[1];
-			var color = d3.scale.linear()
-				// .domain([min_score, (min_score+max_score)/2, max_score])
-				.domain([min_score, 0, max_score])
-				.range(["#1f77b4", "white", "#d62728"]);
-			var legendColor = d3.legend.color()
-				.title(colorAttr)
-				.shapeWidth(20)
-				.cells(5)
-				.labelFormat(d3.format(".2f"))
-				.scale(color);
-		} else{ // color by categorical variable
-			var uniq_categories2 = _.uniq(_.map(graph.nodes, function(d){ return d[colorAttr]}));
-			var range20 = [];
-			for (var i = 0; i != 20; ++i) range20.push(i)
-			var colors20 = d3.scale.category20()
-			// console.log(uniq_categories2)
-			var color = d3.scale.ordinal()
-				.domain(uniq_categories2)
-				.range(_.map(range20, function(i){ return colors20(i); }))
-			var legendColor = d3.legend.color()
-				.title(colorAttr)
-				.shape("path", d3.svg.symbol().type("circle").size(30)())
-				.shapePadding(10)
-				.scale(color);
-		} 		
-
-		var sizeExtent = d3.extent(graph.nodes, function(d){ return d[sizeAttr]});
-		size.domain(sizeExtent)
-
-		// 2. update the node circles
-		circle.attr("d", d3.svg.symbol()
-			.size(function(d) { return Math.PI*Math.pow(size(d[sizeAttr])||nominal_base_node_size,2); })
-			.type(function(d) { return shape(d[shapeAttr]); })
-			)
-		.style("fill", function(d) {
-			return color(d[colorAttr]);
-		});
-
-		// 3. update the legends
-		legendShape.scale(shapeL)
-			.title(convertName(shapeAttr))
-		svg.select("#legendShape").html("")
-			.call(legendShape);
-
-		legendColor.scale(color)
-			.title(convertName(colorAttr));
-		svg.select("#legendColor").html("")
-			.call(legendColor);
-
-		legendSize.scale(size)
-			.title(convertName(sizeAttr))
-		svg.select("#legendSize").html("")
-			.call(legendSize);
-		// update legend text
-		d3.selectAll("text.label").each(function(d, i){
-			if (typeof d === "string") d3.select(this).text(convertName(d));
-		});
-
-		// 4. update zoom
-		zoom.on("zoom", zoomed);
-
-		svg.call(zoom);	 		
-
-	}
-	
-	redraw(shapeAttr, colorAttr, sizeAttr)
-
+	// for controls
 	d3.selectAll("select").on("change", function(){
 		// get new params from select
 		var shapeAttr = d3.select("#shapeAttr").property("value"); 
 		var colorAttr = d3.select("#colorAttr").property("value");
 		var sizeAttr = d3.select("#sizeAttr").property("value");		
 		redraw(shapeAttr, colorAttr, sizeAttr)
-	})
+	});
 
 	d3.select("#show_text").on("change", function(){
 		// controling whether to show text labels
@@ -367,27 +224,132 @@ d3.json('/LJP/result?id=' + rid, function(error, graph) {
 				return "none";
 			}
 		});
-	})
+	});
 
-	// console.log(error)
-	// var linkedByIndex = {}; // to store edges
-	// graph.links.forEach(function(d) {
-	// 	linkedByIndex[d.source + "," + d.target] = true;
-	// });
+	// zoom in/out buttons
+	var btnGroup = controlers.append("div");
 
-	// function isConnected(a, b) {
-	// 	return linkedByIndex[a.index + "," + b.index] || linkedByIndex[b.index + "," + a.index] || a.index == b.index;
-	// }
-
-	// function hasConnections(a) {
-	// 	for (var property in linkedByIndex) {
-	// 		s = property.split(",");
-	// 		if ((s[0] == a.index || s[1] == a.index) && linkedByIndex[property]) return true;
-	// 	}
-	// 	return false;
-	// }
+	btnGroup.append("button")
+		.attr("class", "btn btn-default")
+		.on("click", function(){ zoomByFactor(1.2) })
+		.append("span")
+			.attr("class", "glyphicon glyphicon-zoom-in");
 	
+	btnGroup.append("span").text("  ");
+			
+	btnGroup.append("button")
+		.attr("class", "btn btn-default")
+		.on("click", function(){ zoomByFactor(0.8) })
+		.append("span")
+			.attr("class", "glyphicon glyphicon-zoom-out");
 
+	// functions below
+	function setUpScales(shapeAttr, colorAttr, sizeAttr) {
+		// set up scales for shape, color and size
+		// return global variables: [size, shape, shapeL, color, legendColor]
+		// get extent for sizes	
+		var sizeExtent = d3.extent(graph.nodes, function(d){ return d[sizeAttr]});
+		size = d3.scale.linear()
+			.domain(sizeExtent)
+			.range([0.1,4])
+			.nice();
+
+		// get uniq_categories for shapes
+		var uniq_categories = _.uniq(_.map(graph.nodes, function(d){ return d[shapeAttr]}));
+
+		shape = d3.scale.ordinal()
+			.domain(uniq_categories)
+			.range(d3.svg.symbolTypes);
+		
+		shapeL = d3.scale.ordinal() // used just for d3.legend
+			.domain(uniq_categories)
+			.range(_.map(d3.svg.symbolTypes, function(t) { return d3.svg.symbol().type(t)(); }));
+		
+		// get uniq_categories for colors
+		if (colorAttrContinuous.indexOf(colorAttr) !== -1){ // color by continuous variable 
+			var colorExtent = d3.extent(graph.nodes, function(d) { return d[colorAttr]; });
+			console.log("colorExtent:")
+			console.log(colorExtent)
+			var min_score = colorExtent[0],
+				max_score = colorExtent[1];
+			color = d3.scale.linear()
+				// .domain([min_score, (min_score+max_score)/2, max_score])
+				.domain([min_score, 0, max_score])
+				.range(["#1f77b4", "white", "#d62728"]);
+			legendColor = d3.legend.color()
+				.title(colorAttr)
+				.shapeWidth(20)
+				.cells(5)
+				.labelFormat(d3.format(".2f"))
+				.scale(color);
+		} else{ // color by categorical variable
+			var uniq_categories2 = _.uniq(_.map(graph.nodes, function(d){ return d[colorAttr]}));
+			var range20 = [];
+			for (var i = 0; i != 20; ++i) range20.push(i)
+			var colors20 = d3.scale.category20()
+			color = d3.scale.ordinal()
+				.domain(uniq_categories2)
+				.range(_.map(range20, function(i){ return colors20(i); }))
+			legendColor = d3.legend.color()
+				.title(colorAttr)
+				.shape("path", d3.svg.symbol().type("circle").size(30)())
+				.shapePadding(10)
+				.scale(color);
+		} 
+
+	};
+
+	function drawLegends () {
+		// Draw and/or update legends
+		// shape legend
+		var legendShape = d3.legend.symbol()
+			.scale(shapeL)
+			.orient("vertical")
+			.title(convertName(shapeAttr))
+		svg.select("#legendShape").html("")
+			.call(legendShape);
+		// size legend
+		var legendSize = d3.legend.size()
+			.scale(size)
+			.title(convertName(sizeAttr))
+			.cells(3)
+			.shape('circle')
+			.shapePadding(25)
+			.labelOffset(15)
+			.orient('horizontal');
+		svg.select("#legendSize").html("")
+			.call(legendSize);
+		// color legend
+		legendColor.scale(color)
+			.title(convertName(colorAttr));
+		svg.select("#legendColor").html("")
+			.call(legendColor);
+		// update legend text
+		d3.selectAll("text.label").each(function(d, i){
+			if (typeof d === "string") d3.select(this).text(convertName(d));
+		});
+	};
+
+	function redraw(shapeAttr, colorAttr, sizeAttr) {
+		// 1. update scales
+		setUpScales(shapeAttr, colorAttr, sizeAttr);
+
+		// 2. update the node circles
+		circle.attr("d", d3.svg.symbol()
+			.size(function(d) { return Math.PI*Math.pow(size(d[sizeAttr])||nominal_base_node_size,2); })
+			.type(function(d) { return shape(d[shapeAttr]); })
+			)
+		.style("fill", function(d) {
+			return color(d[colorAttr]);
+		});
+
+		// 3. update the legends
+		drawLegends();
+		// 4. update zoom
+		zoom.on("zoom", zoomed);
+		svg.call(zoom);
+	};
+	
 	function resize() {
 		var width = window.innerWidth, height = window.innerHeight;
 		svg.attr("width", width).attr("height", height);
@@ -427,23 +389,6 @@ d3.json('/LJP/result?id=' + rid, function(error, graph) {
 
 		g.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
 	};
-
-	// zoom in/out buttons
-	var btnGroup = controlers.append("div");
-
-	btnGroup.append("button")
-		.attr("class", "btn btn-default")
-		.on("click", function(){ zoomByFactor(1.2) })
-		.append("span")
-			.attr("class", "glyphicon glyphicon-zoom-in");
-	
-	btnGroup.append("span").text("  ");
-			
-	btnGroup.append("button")
-		.attr("class", "btn btn-default")
-		.on("click", function(){ zoomByFactor(0.8) })
-		.append("span")
-			.attr("class", "glyphicon glyphicon-zoom-out");
 
 	function zoomByFactor(factor){ // for zooming svg after button click
 		var scale = d3.transform(g.attr("transform")).scale[0];;
