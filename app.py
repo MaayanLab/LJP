@@ -29,8 +29,8 @@ def enrich():
 		if request.form['method'] == 'geneSet':
 			up_genes = request.form['upGenes'].split()
 			dn_genes = request.form['dnGenes'].split()
-			print up_genes
-			print dn_genes
+			# print up_genes
+			# print dn_genes
 			user_input = GeneSets(up_genes, dn_genes)
 		elif request.form['method'] == 'CD':
 			genes_vals = request.form['signature'].split()
@@ -40,7 +40,7 @@ def enrich():
 				gene, val = gv.split(',')
 				genes.append(gene)
 				vals.append(float(val))
-			print genes
+			# print genes
 			user_input = Signature(genes, vals)
 
 		## POST to SigineLJP to do the enrichment 

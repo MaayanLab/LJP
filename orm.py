@@ -25,6 +25,7 @@ def load_LJP_net():
 class EnrichmentResult(object):
 	"""EnrichmentResult: object for documents in the userResults collection"""
 	projection = {'_id':0, 'data':0, 'timestamp':0}
+	default_score = 0.
 
 	def __init__(self, rid):
 		'''To retrieve a result using _id'''
@@ -32,9 +33,7 @@ class EnrichmentResult(object):
 		doc = COLL_RES.find_one({'_id': self.rid}, self.projection)
 		self.sig_ids = doc['result']['sig_ids']
 		self.scores = doc['result']['scores']
-		type_ = doc['type']
-		if type_ == 'CD': self.default_score = 1.
-		else: self.default_score = 0.
+		self.type = doc['type']
 		# timestamp = self.rid.generation_time
 
 	def bind_to_network(self, net):
@@ -52,7 +51,7 @@ class UserInput(object):
 	"""The base class for GeneSets and Signature"""
 	config = {"direction":"mimic","combination":False}
 	headers = {'content-type':'application/json'}
-	default_score = None # default enrichment score for an irrelevant signature
+	default_score = 0. # default enrichment score for an irrelevant signature
 
 	def __init__(self, data):
 		self.data = data
@@ -96,7 +95,6 @@ class GeneSets(UserInput):
 		data = {'upGenes': up_genes, 'dnGenes': dn_genes}
 		UserInput.__init__(self, data)
 		self.type = 'geneSet'
-		self.default_score = 0. # overlap/genecount
 
 class Signature(UserInput):
 	"""docstring for Signature"""
@@ -108,8 +106,12 @@ class Signature(UserInput):
 			}
 		UserInput.__init__(self, data)
 		self.type = 'CD'
-		self.default_score = 1. # cosine distance
 
+	def enrich(self):
+		'''Convert cosine distance returned from the Rook API to cosine simiarity'''
+		self.result = super(Signature, self).enrich()
+		self.result['scores'] = map(lambda x: round(1-x, 4), self.result['scores'])
+		return self.result
 
 ## testing
 ## GeneSets user input
