@@ -12,6 +12,7 @@ app.debug = True
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 6
 
 NET = load_LJP_net()
+CCLE = CCLESignatureCollection()
 
 @app.route(ENTER_POINT + '/')
 def root():
@@ -64,6 +65,21 @@ def result():
 		## dump to json
 		net_data = json_graph.node_link_data(net)
 		return json.dumps(net_data)
+
+@app.route(ENTER_POINT + '/ccle', methods=['GET'])
+def ccle():
+	'''
+	Retrieve metadata of CCLE signatures or a specific signature.
+	'''
+	if request.method == 'GET':
+		cell = request.args.get('cell', None)
+		if cell is None:
+			metadata = CCLE.summary()
+			return json.dumps(metadata)
+		else:
+			sig = CCLE.fetch({'cell': cell})
+			return json.dumps(sig.json_data())
+
 
 if __name__ == '__main__':
 	if len(sys.argv) > 1:

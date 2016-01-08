@@ -8,9 +8,9 @@ from bson.objectid import ObjectId
 
 from pymongo import MongoClient
 client = MongoClient('mongodb://10.90.122.109:27017/')
-db = client['LJP2014']
-COLL = db['ljp56Chdirs2']
-COLL_RES = db['userResults']
+DB = client['LJP2014']
+COLL = DB['ljp56Chdirs2']
+COLL_RES = DB['userResults']
 
 ## CONFIGs
 RURL = 'http://146.203.54.71:31164/custom/SigineLJP' # URL for the Rook server doing enrichments
@@ -96,6 +96,10 @@ class GeneSets(UserInput):
 		UserInput.__init__(self, data)
 		self.type = 'geneSet'
 
+	def json_data(self):
+		'''Return an object to be encoded to json format'''
+		return self.data
+
 class Signature(UserInput):
 	"""docstring for Signature"""
 	def __init__(self, genes, vals):
@@ -112,6 +116,44 @@ class Signature(UserInput):
 		self.result = super(Signature, self).enrich()
 		self.result['scores'] = map(lambda x: round(1-x, 4), self.result['scores'])
 		return self.result
+
+	def json_data(self):
+		'''Return an object to be encoded to json format'''
+		return self.data['input']
+
+class SignatureCollection(object):
+	"""A collection of signatures"""
+	projection = {'_id': 0}
+
+	def __init__(self, coll_name):
+		self.coll = DB[coll_name]
+
+	def fetch(self, query):
+		'''Fetch a Signature instance in the collection based on query'''
+		doc = self.coll.find_one(query)
+		return Signature(doc['genes'], doc['vals'])
+		
+
+class CCLESignatureCollection(SignatureCollection):
+	"""The class for a whole collection of example signatures"""
+	def __init__(self):
+		SignatureCollection.__init__(self, 'ccle')
+
+	def summary(self):
+		'''Summary metadata fields and return an array of metadata dicts'''
+		pipeline = [
+			{'$project': {'tissue':1, 'cell':1}},
+			{'$group': {
+				'_id': '$tissue', 
+				'cells': {'$addToSet': '$cell'}}
+			}
+		]
+		res = self.coll.aggregate(pipeline)
+		meta = list(res)
+		self.meta = meta
+		return self.meta
+
+		
 
 ## testing
 ## GeneSets user input
@@ -157,4 +199,9 @@ class Signature(UserInput):
 # net = er.bind_to_network(net)
 # print net.number_of_edges(), net.number_of_nodes()
 # print net.node[n]
+
+# from pprint import pprint
+# esc = CCLESignatureCollection()
+# meta = esc.summary()
+# pprint(meta)
 
