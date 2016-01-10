@@ -12,7 +12,7 @@ var x = d3.scale.linear()
     .range([0, w]);
 
 var y = d3.scale.linear()
-    .range([h, 0]);
+    .range([0, h]);
 
 // for user to read
 var readableMap = {
