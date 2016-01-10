@@ -27,9 +27,15 @@
 				<input type="hidden" name="method" value="CD">
 
 				<div class="form-group">
-					<label for="signature" class="controal-label">Signature</label>
+					<label for="signature" class="control-label">Signature</label>
 					<textarea name="signature" rows="10" class="form-control" required></textarea>
 				</div>
+
+				<div class="form-group">
+					<label for="ccle" class="control-label">CCLE signatures</label>
+					<select id="ccle" class="form-control" placeholder="Select a cell line..."></select>
+				</div>
+				
 
 				<button class="btn btn-default" id="example2">Signature example</button>
 				<input class="btn btn-info" type="submit" value="Search"/>
@@ -37,6 +43,8 @@
 		</div>
 	</div>
 </div>
+<script src="lib/selectize.min.js"></script>
+<link rel="stylesheet" type="text/css" href="lib/selectize.bootstrap3.css">
 <script>
 $("#example1").click(function(e){
 	e.preventDefault();
@@ -48,19 +56,47 @@ $("#example1").click(function(e){
 
 })
 
+function fillSignature(data){
+	// fill signature data to the textarea
+	var signatureTextarea = $("[name=signature]");
+	var signatureStr = '';
+	signatureTextarea.text(signatureStr);
+	for (var i = 0; i < data['vals'].length; i++) {
+		var val = data['vals'][i]
+		var gene = data['genes'][i]
+		signatureStr += gene + ',' + val + '\n';
+	};
+	signatureTextarea.text(signatureStr);
+};
+
 $("#example2").click(function(e){
 	e.preventDefault();
 	d3.json("test/ebovs.json", function(data){
 		data = data['ebov30min'];
-		var signatureStr = '';
-		for (var i = 0; i < data['vals'].length; i++) {
-			var val = data['vals'][i]
-			var gene = data['genes'][i]
-			signatureStr += gene + ',' + val + '\n';
-		};
-		$("[name=signature]").text(signatureStr);
-	})
-
+		fillSignature(data);
+	});
 })
+
+
+$.getJSON('/LJP/ccle', function(meta){
+	var select = $("#ccle").selectize({
+		options: meta.options,
+		optgroups: meta.optgroups,
+		labelField: 'cell',
+		valueField: 'cell',
+		optgroupField: 'tissue',
+		optgroupLabelField: 'name',
+		optgroupValueField: 'id',
+		optgroupOrder: meta.optgroups.map(function(d) { return d.id; }),
+		searchField: ['cell', 'tissue'],
+		// plugins: ['optgroup_columns']
+		onChange: function(cell){ // cell line selected
+			console.log(cell)
+			$.getJSON('/LJP/ccle?cell='+cell, function(data){
+				fillSignature(data);
+			});
+		},
+	}); 
+});
 
 </script>

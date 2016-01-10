@@ -7,7 +7,8 @@ from networkx.readwrite import json_graph
 from bson.objectid import ObjectId
 
 from pymongo import MongoClient
-client = MongoClient('mongodb://10.90.122.109:27017/')
+# client = MongoClient('mongodb://10.90.122.109:27017/')
+client = MongoClient('mongodb://127.0.0.1:27017/')
 DB = client['LJP2014']
 COLL = DB['ljp56Chdirs2']
 COLL_RES = DB['userResults']
@@ -141,15 +142,20 @@ class CCLESignatureCollection(SignatureCollection):
 
 	def summary(self):
 		'''Summary metadata fields and return an array of metadata dicts'''
-		pipeline = [
-			{'$project': {'tissue':1, 'cell':1}},
-			{'$group': {
-				'_id': '$tissue', 
-				'cells': {'$addToSet': '$cell'}}
-			}
-		]
-		res = self.coll.aggregate(pipeline)
-		meta = list(res)
+		# pipeline = [
+		# 	{'$project': {'tissue':1, 'cell':1}},
+		# 	{'$group': {
+		# 		'_id': '$tissue', 
+		# 		'cells': {'$addToSet': '$cell'}}
+		# 	}
+		# ]
+		# res = self.coll.aggregate(pipeline)
+		# meta = list(res)
+		res = self.coll.find({}, {'cell':1,'tissue':1,'_id':0})
+		options = list(res)
+		optgroups = self.coll.distinct('tissue')
+		meta = {'options': options, 
+			'optgroups': [{'id': tissue, 'name': tissue[0] + tissue[1:].lower().replace('_', ' ')} for tissue in optgroups]}
 		self.meta = meta
 		return self.meta
 
