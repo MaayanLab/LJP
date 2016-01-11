@@ -451,6 +451,19 @@ d3.json(graph_fn, function(error, graph) {
 		.append("span")
 			.attr("class", "glyphicon glyphicon-zoom-out");
 
+	// zoom out a little to display the whole view
+	var factor =0.8;
+	var scale = d3.transform(g.attr("transform")).scale[0];
+	var extent = [min_zoom,max_zoom];
+	var newScale = scale * factor;
+	var t = zoom.translate();
+	var c = [w / 2, h / 2];
+			zoom.scale(newScale)
+				.translate(
+				[c[0] + (t[0] - c[0]) / scale * newScale, 
+				c[1] + (t[1] - c[1]) / scale * newScale])
+				.event(svg.transition().duration(0))
+
 	function zoomByFactor(factor){ // for zooming svg after button click
 		var scale = d3.transform(g.attr("transform")).scale[0];;
 		var extent = [min_zoom,max_zoom];

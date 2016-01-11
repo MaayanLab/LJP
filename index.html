@@ -15,19 +15,39 @@
 		<div class="container-fluid">
 			<!-- Brand and toggle get grouped for better mobile display -->
 			<div class="navbar-header">
-				<a class="navbar-brand" href="#">LJP Enrichment Tool</a>
+				<button type='button' class='navbar-toggle' data-toggle='collapse' data-target='#collapse'> 
+					<span class='sr-only'>Toogle navigation</span>
+					<span class='icon-bar'></span>
+					<span class='icon-bar'></span>
+					<span class='icon-bar'></span>
+				</button>
 			</div>
+
+			<a href="#" class='navbar-brand'><span class='navbar-title'>LINCS Joint Project (LJP)<br>Breast Cancer Network Browser</span></a>
+
 			<!-- Collect the nav links, forms, and other content for toggling -->
-			<div class="collapse navbar-collapse">
+			<div class="collapse navbar-collapse" id="collapse">
 				<ul class="nav navbar-nav">
-					<li><a href="#/">Home</a></li>
-					<li><a href="#/search">Search signatures</a></li>
+					<li><a href="#/">Network View</a></li>
+					<li><a href="#/search">Submit Your Own Signature</a></li>
 				</ul>
 			</div><!-- /.navbar-collapse -->
 		</div><!-- /.container-fluid -->
 	</nav>
 
 	<div class="container-fluid" id="page-content"></div>
+
+	<div class="footer theme-color-dark">
+		<div class="footer-wrapper">
+			<span class="title logo-title bd2k"><a href="http://lincs-dcic.org/" target="_blank")>BD2K-LINCS DCIC</a> </span>
+			<span class="title logo-title bd2k"><a href="http://icahn.mssm.edu/research/labs/maayan-laboratory" target="_blank">Ma'ayan Lab of Computational Systems Biology</a></span>
+			<span class="title logo-title bd2k"><a href="https://commonfund.nih.gov/idg/overview" target="_blank">KMC-IDG</a></span>
+			<span class="title logo-title bd2k"><a href="http://hits.harvard.edu/the-program/laboratory-of-systems-pharmacology/about/" target="_blank">The HMS Lab of Systems Pharmacology</a></span>
+			<span class="title logo-title bd2k"><a href="http://www.lincsproject.org/" target="_blank">LINCS project</a></span>
+			<span class="title logo-title bd2k"><a href="http://www.lincscloud.org/" target="_blank">The Connectivity Map</a></span>
+		</div>
+	</div>
+
 
 	<script src="lib/d3.v3.min.js"></script>
 	<script src="lib/jquery.min.js"></script>
