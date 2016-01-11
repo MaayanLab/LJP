@@ -48,7 +48,7 @@ def enrich():
 		res = user_input.enrich()
 		## save user input and enrichment results to db and get a result id
 		rid = user_input.save()
-	return redirect(ENTER_POINT + '/#result/' + rid, code=302)
+	return redirect(ENTER_POINT + '/#/result/' + rid, code=302)
 
 @app.route(ENTER_POINT + '/result', methods=['GET'])
 def result():

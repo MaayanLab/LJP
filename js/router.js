@@ -3,12 +3,17 @@ var Router = Backbone.Router.extend({
 	el: "#page-content", // selector to load page content
 
 	routes: {
-		'': 'home',
+		'': 'view',
+		'search': 'search',
 		'result/:id': 'result'
 	},
 
-	home: function(){
-		$(this.el).load("home.html", function() {
+	view: function(){
+		$(this.el).load("view.html");
+	},
+
+	search: function(){
+		$(this.el).load("search.html", function() {
 
 		});
 	},
