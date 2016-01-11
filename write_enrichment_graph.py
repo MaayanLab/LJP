@@ -111,6 +111,26 @@ def get_consensus_enriched_terms2(df, d_group_sigids):
 			d_sig_id_topterm[sig_id] = topterm	
 	return d_sig_id_topterm	
 
+def get_consensus_enriched_terms2_for_group(df, d_group_sigids):
+	## similar to get_consensus_enriched_terms2 except return a dict
+	## of dfs with group as key
+	d_group_df = {}
+	terms = np.array(df.index.tolist())
+	sig_ids_in_df = df.columns.tolist()
+
+	rank_mat = df.rank(axis=0, na_option='bottom', ascending=False).values
+	for group, sig_ids in d_group_sigids.items():
+		idx = np.in1d(sig_ids_in_df, sig_ids)
+		sub_rank_mat = rank_mat[:, idx]
+		idx = np.where(idx)[0] # convert bool index to number index
+		rp = np.prod(sub_rank_mat, axis=1) # rank product for each terms
+		df = pd.DataFrame({'RP': rp, 'terms': terms})
+
+		d_group_df[group] = df
+
+	return d_group_df
+
+
 data = json.load(open('../harvard_net_with_pos.json','rb'))
 G = json_graph.node_link_graph(data)
 
@@ -153,27 +173,32 @@ for gmt_name in gmt_names:
 	up_val_df = d_all_result[gmt_name + '-up']
 	dn_val_df = d_all_result[gmt_name + '-dn']
 
-	## find top enriched term for each sig_id and bind them to G
-	# d_sig_id_terms = get_top_enriched_term(up_pval_mat, d_gmt, sig_ids, pval_cutoff=pval_cutoff, rank_cutoff=rank_cutoff)
-	# d_sig_id_terms = get_consensus_enriched_terms(up_pval_mat, d_gmt, sig_ids, d_group_idx)
-	d_sig_id_terms = get_consensus_enriched_terms2(up_val_df, d_group_idx)
-	key = gmt_name + '|up'
-	for sig_id, term in d_sig_id_terms.items():
-		G.node[sig_id][key] = term
+	# ## find top enriched term for each sig_id and bind them to G
+	# # d_sig_id_terms = get_top_enriched_term(up_pval_mat, d_gmt, sig_ids, pval_cutoff=pval_cutoff, rank_cutoff=rank_cutoff)
+	# # d_sig_id_terms = get_consensus_enriched_terms(up_pval_mat, d_gmt, sig_ids, d_group_idx)
+	# d_sig_id_terms = get_consensus_enriched_terms2(up_val_df, d_group_idx)
+	# key = gmt_name + '|up'
+	# for sig_id, term in d_sig_id_terms.items():
+	# 	G.node[sig_id][key] = term
 
-	# d_sig_id_terms = get_top_enriched_term(dn_pval_mat, d_gmt, sig_ids, pval_cutoff=pval_cutoff, rank_cutoff=rank_cutoff)
-	# d_sig_id_terms = get_consensus_enriched_terms(dn_pval_mat, d_gmt, sig_ids, d_group_idx)
-	d_sig_id_terms = get_consensus_enriched_terms2(dn_val_df, d_group_idx)
-	key = gmt_name + '|dn'
-	for sig_id, term in d_sig_id_terms.items():
-		G.node[sig_id][key] = term
+	# # d_sig_id_terms = get_top_enriched_term(dn_pval_mat, d_gmt, sig_ids, pval_cutoff=pval_cutoff, rank_cutoff=rank_cutoff)
+	# # d_sig_id_terms = get_consensus_enriched_terms(dn_pval_mat, d_gmt, sig_ids, d_group_idx)
+	# d_sig_id_terms = get_consensus_enriched_terms2(dn_val_df, d_group_idx)
+	# key = gmt_name + '|dn'
+	# for sig_id, term in d_sig_id_terms.items():
+	# 	G.node[sig_id][key] = term
 
+	## get table of consensus enrichment for each cluster
+	# d_group_df = get_consensus_enriched_terms2_for_group(up_val_df, d_group_idx)
+	print up_val_df.head()
+	print up_val_df.shape
+	break
 
 
 ## output network
-data = json_graph.node_link_data(G)
-# json.dump(data, open('../harvard_net_with_pos_enriched_terms.json', 'wb'))
-# json.dump(data, open('data/harvard_net_with_pos_enriched_terms.json', 'wb'))
+# data = json_graph.node_link_data(G)
+# # json.dump(data, open('../harvard_net_with_pos_enriched_terms.json', 'wb'))
+# # json.dump(data, open('data/harvard_net_with_pos_enriched_terms.json', 'wb'))
 
-json.dump(data, open('../harvard_net_with_pos_Cidx_enriched_terms_combined_score.json', 'wb'))
-json.dump(data, open('data/harvard_net_with_pos_Cidx_enriched_terms_combined_score.json', 'wb'))
+# json.dump(data, open('../harvard_net_with_pos_Cidx_enriched_terms_combined_score.json', 'wb'))
+# json.dump(data, open('data/harvard_net_with_pos_Cidx_enriched_terms_combined_score.json', 'wb'))
