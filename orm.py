@@ -7,8 +7,8 @@ from networkx.readwrite import json_graph
 from bson.objectid import ObjectId
 
 from pymongo import MongoClient
-# client = MongoClient('mongodb://10.90.122.109:27017/')
-client = MongoClient('mongodb://127.0.0.1:27017/')
+client = MongoClient('mongodb://10.90.122.109:27017/')
+# client = MongoClient('mongodb://127.0.0.1:27017/')
 DB = client['LJP2014']
 COLL = DB['ljp56Chdirs2']
 COLL_RES = DB['userResults']
@@ -21,6 +21,8 @@ LJP_NET_PATH = 'data/harvard_net_with_pos.json'
 def load_LJP_net():
 	data = json.load(open(LJP_NET_PATH, 'rb'))
 	net = json_graph.node_link_graph(data)
+	## remove all links since they are not required for visualization
+	net.remove_edges_from(net.edges())
 	return net
 
 class EnrichmentResult(object):

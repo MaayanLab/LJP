@@ -19,3 +19,8 @@ text {
 #controlers {
 	cursor: move;
 }
+
+.highlight {
+	fill: yellow;
+	opacity: 0.25;
+}

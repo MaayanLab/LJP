@@ -133,11 +133,14 @@ d3.json('/LJP/result?id=' + rid, function(error, graph) {
 	// to get the extent of x and y from the data
 	x.domain(d3.extent(graph.nodes, function(d) { return d.position.x; })).nice();
 	y.domain(d3.extent(graph.nodes, function(d) { return d.position.y; })).nice();
-
+	console.log(graph.links)
 	// sort nodes by Enrichment scores to get top and bottom 5 sigIds
-	var sortedSigIds = _.map(_.sortBy(graph.nodes, 'Enrichment score'), function(d){ return d.id; });
+	var sortedNodes = _.sortBy(graph.nodes, 'Enrichment score')
+	var sortedSigIds = _.map(sortedNodes, function(d){ return d.id; });
 	var bottomSigIds = sortedSigIds.slice(0,5),
 		topSigIds = sortedSigIds.slice(-5);
+	// make sure the nodes to be highlighted are at the right of the array	
+	sortedNodes = sortedNodes.slice(5, sortedNodes.length).concat(sortedNodes.slice(0,5));
 	sortedSigIds = null;
 
 	// get default params
@@ -154,7 +157,8 @@ d3.json('/LJP/result?id=' + rid, function(error, graph) {
 	// draw the actural nodes of the network
 	// node is the wrapper of path and text for each nodes
 	var node = g.selectAll(".node")
-		.data(graph.nodes)
+		// .data(graph.nodes)
+		.data(sortedNodes)
 		.enter().append("g")
 		.attr("class", "node")
 		.attr("transform", function(d, i){
@@ -389,12 +393,7 @@ d3.json('/LJP/result?id=' + rid, function(error, graph) {
 				var currentDisplay = d3.select(this).attr("display");
 				return currentDisplay;
 			};
-		})
-		// .style("z-index", function(d){
-		// 	if (sigIds.indexOf(d.id) !== -1) { return "1"; }
-		// 	else { return "-1"}
-		// })
-		.style("font-size", function(d){
+		}).style("font-size", function(d){
 			if (sigIds.indexOf(d.id) !== -1) { return "10px"; } 
 			else{ return nominal_text_size+"px"; }
 		}).style("fill", function(d){
@@ -402,6 +401,15 @@ d3.json('/LJP/result?id=' + rid, function(error, graph) {
 			if (bottomSigIds.indexOf(d.id) !== -1) { return "blue"; } 
 		});
 
+		d3.selectAll(".highlight").remove();
+		// add highlight circles
+		node.each(function(d){
+			if (sigIds.indexOf(d.id) !== -1) {
+				d3.select(this).append("circle")
+					.attr("class", "highlight")
+					.attr("r", 10)
+			} 
+		});
 	};
 
 	function zoomed() {
