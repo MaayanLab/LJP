@@ -13,6 +13,7 @@ app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 6
 
 NET = load_LJP_net()
 CCLE = CCLESignatureCollection()
+DISEASES = DiseaseSignatureCollection()
 
 @app.route(ENTER_POINT + '/')
 def root():
@@ -79,6 +80,21 @@ def ccle():
 		else:
 			sig = CCLE.fetch({'cell': cell})
 			return json.dumps(sig.json_data())
+
+@app.route(ENTER_POINT + '/diseases', methods=['GET'])
+def diseases():
+	'''
+	Retrieve metadata of disease signatures or a specific signature.
+	'''
+	if request.method == 'GET':
+		disease = request.args.get('disease', None)
+		if disease is None:
+			metadata = DISEASES.summary()
+			return json.dumps(metadata)
+		else:
+			sig = DISEASES.fetch({'term': disease})
+			return json.dumps(sig.json_data())
+
 
 
 if __name__ == '__main__':

@@ -53,3 +53,33 @@ $.getJSON(config['ENTER_POINT']+'/ccle', function(meta){
 		},
 	}); 
 });
+
+
+$.getJSON(config['ENTER_POINT']+'/diseases', function(meta){
+	var select = $("#disease").selectize({
+		options: meta.options,
+		// optgroups: meta.optgroups,
+		labelField: 'term',
+		valueField: 'term',
+		searchField: ['term'],
+
+		onChange: function(disease){ // disease selected
+			console.log(disease)
+			$.getJSON('/LJP/diseases?disease='+disease, function(data){
+				fillSignature(data);
+			});
+		},
+
+		// render: function(){
+		// 	item: function(item, escape){
+		// 		return '<div>' +
+  //               (item.term ? '<span class="name">' + escape(item.term) + '</span>' : '') +
+  //               (item.desc ? '<span class="desc">' + escape(item.desc) + '</span>' : '') +
+  //           '</div>';
+		// 	},
+		// 	option: function(item, excape)
+		// },
+	}); 
+});
+
+

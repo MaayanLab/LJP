@@ -164,6 +164,17 @@ class CCLESignatureCollection(SignatureCollection):
 		self.meta = meta
 		return self.meta
 
+class DiseaseSignatureCollection(SignatureCollection):
+	"""docstring for DiseaseSignatureCollection"""
+	def __init__(self):
+		SignatureCollection.__init__(self, 'diseases')
+
+	def summary(self):
+		res = self.coll.find({}, {'term':1, 'desc':1, '_id':0})
+		options = list(res)
+		meta = {'options': options}
+		self.meta = meta
+		return self.meta
 		
 
 ## testing
