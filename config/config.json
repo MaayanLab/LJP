@@ -1,0 +1,6 @@
+{
+	"mongoURI": "mongodb://10.90.122.109:27017/",
+	"RURL" : "http://146.203.54.71:31164/custom/SigineLJP",
+	"LJP_NET_PATH" : "data/harvard_net_with_pos.json",
+	"ENTER_POINT": "/LJP"
+}

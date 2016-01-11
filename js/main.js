@@ -115,7 +115,7 @@ div.append("input")
 	.property("checked", true);
 
 // default params
-console.log(params);
+// console.log(params);
 
 // Create DOM for tooltip
 var tooltip = d3.select("body").append("div")
@@ -127,13 +127,12 @@ var tooltip = d3.select("body").append("div")
 // get rid from the URL
 // seems hacky and may need to change
 var rid = window.location.href.split('/').slice(-1).pop()
-console.log(rid)
+// console.log(rid)
 
-d3.json('/LJP/result?id=' + rid, function(error, graph) {
+d3.json(config['ENTER_POINT'] + '/result?id=' + rid, function(error, graph) {
 	// to get the extent of x and y from the data
 	x.domain(d3.extent(graph.nodes, function(d) { return d.position.x; })).nice();
 	y.domain(d3.extent(graph.nodes, function(d) { return d.position.y; })).nice();
-	console.log(graph.links)
 	// sort nodes by Enrichment scores to get top and bottom 5 sigIds
 	var sortedNodes = _.sortBy(graph.nodes, 'Enrichment score')
 	var sortedSigIds = _.map(sortedNodes, function(d){ return d.id; });
@@ -283,8 +282,8 @@ d3.json('/LJP/result?id=' + rid, function(error, graph) {
 		// get uniq_categories for colors
 		if (colorAttrContinuous.indexOf(colorAttr) !== -1){ // color by continuous variable 
 			var colorExtent = d3.extent(graph.nodes, function(d) { return d[colorAttr]; });
-			console.log("colorExtent:")
-			console.log(colorExtent)
+			// console.log("colorExtent:")
+			// console.log(colorExtent)
 			var min_score = colorExtent[0],
 				max_score = colorExtent[1];
 			if (min_score * max_score < 0) { // min_score < 0 ; max_score > 0

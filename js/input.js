@@ -1,4 +1,6 @@
 // scripts for the input page
+// console.log(config)
+
 $("#example1").click(function(e){
 	e.preventDefault();
 	d3.json("test/ebovs_crispy_old.json", function(data){
@@ -31,7 +33,7 @@ $("#example2").click(function(e){
 })
 
 
-$.getJSON('/LJP/ccle', function(meta){
+$.getJSON(config['ENTER_POINT']+'/ccle', function(meta){
 	var select = $("#ccle").selectize({
 		options: meta.options,
 		optgroups: meta.optgroups,

@@ -7,16 +7,19 @@ from networkx.readwrite import json_graph
 from bson.objectid import ObjectId
 
 from pymongo import MongoClient
-client = MongoClient('mongodb://10.90.122.109:27017/')
+
+## load CONFIG
+CONFIG = json.load(open('config/config.json', 'rb'))
+
+client = MongoClient(CONFIG['mongoURI'])
 # client = MongoClient('mongodb://127.0.0.1:27017/')
 DB = client['LJP2014']
 COLL = DB['ljp56Chdirs2']
 COLL_RES = DB['userResults']
 
 ## CONFIGs
-RURL = 'http://146.203.54.71:31164/custom/SigineLJP' # URL for the Rook server doing enrichments
-LJP_NET_PATH = 'data/harvard_net_with_pos.json'
-
+RURL = CONFIG['RURL'] # URL for the Rook server doing enrichments
+LJP_NET_PATH = CONFIG['LJP_NET_PATH']
 
 def load_LJP_net():
 	data = json.load(open(LJP_NET_PATH, 'rb'))
