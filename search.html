@@ -1,8 +1,8 @@
 <div class="row">
 	<div class="col-sm-10 col-sm-offset-1">
 		<div class="alert alert-info">
-			From this page, you can submit gene sets or gene signatures for analysis with the LINCS Joint Project (LJP) Breast Cancer Network Browser. The submitted gene sets and signatures will be projected onto the network of single drug perturbations applied to the six breast cancer cell lines. Click on the grey button examples for a demonstration of the input format.
-			Search for LJP signatures using up/down gene sets or signature.</div>
+			From this page you can submit gene sets, or gene signatures, for analysis with the LJP-BCNB. The submitted gene sets and signatures will be projected onto the network of single drug perturbations applied to the six breast cancer cell lines. Clicking on the grey buttons will fill the input boxes with demonstrative examples of the input format. You can also fetch gene expression sigantures we computed from <a class="alert-link" href="http://www.broadinstitute.org/ccle/home" target="_blank"> the Cancer Cell Line Encyclopedia (CCLE)</a> as well as <a class="alert-link" href="amp.pharm.mssm.edu/CREEDS" target="_blank">670 disease signatures</a> extracted from the <a class="alert-link" href="http://www.ncbi.nlm.nih.gov/geo/" target="_blank">Gene Expression Omnibus (GEO)</a>.
+		</div>
 			
 		<div class="col-xs-5">
 			<form class="form-horizontal" id="geneSet" method="post" action="/LJP/enrich">
@@ -18,8 +18,16 @@
 					<textarea name="dnGenes" rows="10" class="form-control" required></textarea>
 				</div>
 
-				<button class="btn btn-default" id="example1">Gene set example</button>
-				<input class="btn btn-info" type="submit" value="Project onto the LJP network"/>
+				<div class="row">
+					<div class="col-md-5">
+						<button class="btn btn-default" id="example1">Gene set example</button>
+					</div>
+					<div class="col-md-2"></div>
+					<div class="col-md-5">
+						<input class="btn btn-info" type="submit" value="Project onto the LJP network"/>
+					</div>
+				</div>
+
 			</form>
 		</div>
 
@@ -35,13 +43,20 @@
 				</div>
 
 				<div class="form-group">
-					<label for="ccle" class="control-label">Try an CCLE signature</label>
+					<label for="ccle" class="control-label">Fetch an CCLE signature</label>
 					<select id="ccle" class="form-control" placeholder="Type to select a cell line..."></select>
 				</div>
 				
-
-				<button class="btn btn-default" id="example2">Signature example</button>
-				<input class="btn btn-info" type="submit" value="Project onto the LJP network"/>
+				<div class="row">
+					<div class="col-md-5">
+						<button class="btn btn-default" id="example2">Signature example</button>
+					</div>
+					<div class="col-md-2"></div>
+					<div class="col-md-5">
+						<input class="btn btn-info" type="submit" value="Project onto the LJP network"/>
+					</div>
+				</div>
+				
 			</form>
 		</div>
 	</div>
