@@ -11,7 +11,7 @@ import pandas as pd
 from networkx.readwrite import json_graph
 
 sys.path.append('/Users/zichen/Documents/bitbucket/maayanlab_utils')
-from fileIO import read_gmt
+from fileIO import read_gmt, dfs2xlsx
 
 ## extract top enriched terms and make json
 
@@ -122,11 +122,15 @@ def get_consensus_enriched_terms2_for_group(df, d_group_sigids):
 	for group, sig_ids in d_group_sigids.items():
 		idx = np.in1d(sig_ids_in_df, sig_ids)
 		sub_rank_mat = rank_mat[:, idx]
-		idx = np.where(idx)[0] # convert bool index to number index
-		rp = np.prod(sub_rank_mat, axis=1) # rank product for each terms
-		df = pd.DataFrame({'RP': rp, 'terms': terms})
+		# idx = np.where(idx)[0] # convert bool index to number index
+		rp = np.mean(sub_rank_mat, axis=1) # rank product for each terms
+		df_rp = pd.DataFrame({'RP': rp, 'terms': terms})
+		df_rp = df_rp.sort('RP').iloc[0:5, :]
+		df_rp['Cidx'] = group
+		df_rp = df_rp[['Cidx', 'terms', 'RP']]
+		df_rp.columns = ['Cluster Index', 'Enriched Terms', 'Rank Average']
 
-		d_group_df[group] = df
+		d_group_df[group] = df_rp
 
 	return d_group_df
 
@@ -157,7 +161,16 @@ gmt_names = [
 	'GO_Biological_Process_2015',
 ]
 
+gmt_names_display = {
+	'MGI_Mammalian_Phenotype_Level_4': 'MGI_Mammalian_Phenotype', 
+	'Epigenomics_Roadmap_HM_ChIP-seq': 'Epigenomics_Roadmap_HM',
+	'ENCODE_TF_ChIP-seq_2015': 'ENCODE_TF',
+	'GO_Biological_Process_2015': 'GO_Biological_Process',
+}
+
 rank_cutoff = 5
+
+d_gmt_table = {}
 
 for gmt_name in gmt_names:
 	print gmt_name
@@ -188,11 +201,24 @@ for gmt_name in gmt_names:
 	# for sig_id, term in d_sig_id_terms.items():
 	# 	G.node[sig_id][key] = term
 
+
+
 	## get table of consensus enrichment for each cluster
-	# d_group_df = get_consensus_enriched_terms2_for_group(up_val_df, d_group_idx)
-	print up_val_df.head()
-	print up_val_df.shape
-	break
+	if gmt_name in gmt_names_display:
+		gmt_name = gmt_names_display[gmt_name]
+
+	d_group_df = get_consensus_enriched_terms2_for_group(up_val_df, d_group_idx)
+	table = pd.DataFrame()
+	for group, df in d_group_df.items():
+		table = table.append(df)
+	d_gmt_table[gmt_name + '|UP'] = table
+
+	d_group_df = get_consensus_enriched_terms2_for_group(dn_val_df, d_group_idx)
+	table = pd.DataFrame()
+	for group, df in d_group_df.items():
+		table = table.append(df)
+	d_gmt_table[gmt_name + '|DOWN'] = table
+	
 
 
 ## output network
@@ -202,3 +228,6 @@ for gmt_name in gmt_names:
 
 # json.dump(data, open('../harvard_net_with_pos_Cidx_enriched_terms_combined_score.json', 'wb'))
 # json.dump(data, open('data/harvard_net_with_pos_Cidx_enriched_terms_combined_score.json', 'wb'))
+
+## output excel file for consensus enriched terms of clusters
+dfs2xlsx(d_gmt_table, '../Consensus_enrichment_clusters.xlsx', index=False)
