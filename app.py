@@ -11,6 +11,7 @@ app = Flask(__name__, static_url_path=ENTER_POINT, static_folder=os.getcwd())
 app.debug = True
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 6
 
+TABLE = load_enrichment_table()
 NET = load_LJP_net()
 CCLE = CCLESignatureCollection()
 DISEASES = DiseaseSignatureCollection()
@@ -94,6 +95,34 @@ def diseases():
 		else:
 			sig = DISEASES.fetch({'term': disease})
 			return json.dumps(sig.json_data())
+
+@app.route(ENTER_POINT + '/annotation', methods=['GET'])
+def annotation():
+	'''
+	Retrieve table for top enriched terms for clusters
+	'''
+	if request.method == 'GET':
+		## GET args
+		cidx = int(request.args.get('cidx', 1))
+		library = request.args.get('library', None)
+		direction = request.args.get('direction', None)
+
+		if None in (cidx, library, direction): # output meta
+			meta = {}
+			for col in TABLE.columns:
+				if col not in ('Enriched Terms', 'Rank Average', 'Library'):
+					meta[col] = TABLE[col].unique().tolist()
+			## reorder libraries
+			meta['Library'] = ['GO_Biological_Process', 'KEGG_2015', 'MGI_Mammalian_Phenotype', 
+				'ChEA_2015', 'ENCODE_TF', 'KEA_2015', 'Epigenomics_Roadmap_HM']
+			return json.dumps(meta)
+		else: # output subset of table
+			sub_table = TABLE.loc[
+				(TABLE['Cluster Index'] == cidx) &
+				(TABLE['Library'] == library) &
+				(TABLE['Direction'] == direction)
+			, :][['Enriched Terms', 'Rank Average']]
+			return sub_table.to_json()
 
 
 

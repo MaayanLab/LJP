@@ -5,7 +5,8 @@ var Router = Backbone.Router.extend({
 	routes: {
 		'': 'view',
 		'search': 'search',
-		'result/:id': 'result'
+		'result/:id': 'result',
+		'annotation': 'annotation'
 	},
 
 	view: function(){
@@ -23,6 +24,10 @@ var Router = Backbone.Router.extend({
 			// console.log(id)
 		});
 	},
+
+	annotation: function(){
+		$(this.el).load("annotation.html");
+	}
 
 });
 

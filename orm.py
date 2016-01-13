@@ -2,6 +2,7 @@
 Database connections and Classes 
 '''
 import json, requests
+import pandas as pd
 import networkx as nx
 from networkx.readwrite import json_graph
 from bson.objectid import ObjectId
@@ -27,6 +28,10 @@ def load_LJP_net():
 	## remove all links since they are not required for visualization
 	net.remove_edges_from(net.edges())
 	return net
+
+def load_enrichment_table():
+	df = pd.read_csv('data/cluster_enrichment_table.csv')
+	return df
 
 class EnrichmentResult(object):
 	"""EnrichmentResult: object for documents in the userResults collection"""
@@ -227,3 +232,8 @@ class DiseaseSignatureCollection(SignatureCollection):
 # meta = esc.summary()
 # pprint(meta)
 
+# df = load_enrichment_table()
+# print df.head()
+# print df.shape
+# print df.loc[(df['Cluster Index'] == 1) & (df['Library'] == 'KEA_2015'), :].shape
+# print df['Cluster Index'].unique()

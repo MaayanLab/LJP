@@ -1,7 +1,7 @@
 FROM python:2.7
 
 # Install required python packages:
-RUN pip install pymongo Flask requests networkx
+RUN pip install pymongo Flask requests networkx pandas
 
 # Copy the application folder inside the container
 ADD . /my_application
