@@ -167,7 +167,7 @@ d3.json(config['ENTER_POINT'] + '/result?id=' + rid, function(error, graph) {
 	// set up scales used to draw shape, color and size
 	setUpScales(shapeAttr, colorAttr, sizeAttr);
 	// draw legends
-	drawLegends();
+	drawLegends(shapeAttr, colorAttr, sizeAttr);
 
 	// draw the actural nodes of the network
 	// node is the wrapper of path and text for each nodes
@@ -333,7 +333,7 @@ d3.json(config['ENTER_POINT'] + '/result?id=' + rid, function(error, graph) {
 
 	};
 
-	function drawLegends () {
+	function drawLegends (shapeAttr, colorAttr, sizeAttr) {
 		// Draw and/or update legends
 		// shape legend
 		var legendShape = d3.legend.symbol()
@@ -358,6 +358,17 @@ d3.json(config['ENTER_POINT'] + '/result?id=' + rid, function(error, graph) {
 			.title(convertName(colorAttr));
 		svg.select("#legendColor").html("")
 			.call(legendColor);
+
+		// add subtitle if coloring by Enrichment score
+		d3.select("#legendColor").append('text')
+			.attr("transform", "translate(0,15)")
+			.text(function(){
+				var colorLegendTitle = d3.select("#colorAttr").property("value");
+				if (colorLegendTitle === 'Enrichment score') {
+					return 'positive: mimic; negative: reverse'
+				} else { return ''; }
+			})
+			.style('font-size', 12)
 		// update legend text
 		d3.selectAll("text.label").each(function(d, i){
 			if (typeof d === "string") d3.select(this).text(convertName(d));
@@ -378,7 +389,7 @@ d3.json(config['ENTER_POINT'] + '/result?id=' + rid, function(error, graph) {
 		});
 
 		// 3. update the legends
-		drawLegends();
+		drawLegends(shapeAttr, colorAttr, sizeAttr);
 		// 4. update zoom
 		zoom.on("zoom", zoomed);
 		svg.call(zoom);
