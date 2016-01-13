@@ -344,7 +344,7 @@ d3.json(config['ENTER_POINT'] + '/annotation', function(controlAttrs){
 				// .attr("class", "well");
 
 			var getParams = $.param(params);
-			console.log(params)
+			// console.log(params)
 			// to get table using params:
 			d3.json(config['ENTER_POINT'] + '/annotation?' + getParams, function(tableData){
 				// display table on DOM

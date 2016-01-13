@@ -25,7 +25,7 @@ LJP_NET_PATH = CONFIG['LJP_NET_PATH']
 def load_LJP_net(net_path=None):
 	if net_path is None:
 		net_path = LJP_NET_PATH
-	data = json.load(open(LJP_NET_PATH, 'rb'))
+	data = json.load(open(net_path, 'rb'))
 	net = json_graph.node_link_graph(data)
 	## remove all links since they are not required for visualization
 	net.remove_edges_from(net.edges())
