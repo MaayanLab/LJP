@@ -230,4 +230,21 @@ for gmt_name in gmt_names:
 # json.dump(data, open('data/harvard_net_with_pos_Cidx_enriched_terms_combined_score.json', 'wb'))
 
 ## output excel file for consensus enriched terms of clusters
-dfs2xlsx(d_gmt_table, '../Consensus_enrichment_clusters.xlsx', index=False)
+outfn = '../Consensus_enrichment_clusters.xlsx'
+
+# dfs2xlsx(d_gmt_table, outfn, index=False)
+from pandas import ExcelWriter
+print d_gmt_table.keys()
+writer = ExcelWriter(outfn, engine='xlsxwriter')
+df_combined = pd.DataFrame()
+for key, df in d_gmt_table.items():
+	library, direction = key.split('|')
+
+	# df['Library|direction'] = key
+	df['Library'] = library
+	df['Direction'] = direction
+	df_combined = df_combined.append(df)
+# df_combined.to_excel(writer, 'Sheet1', index=False)
+## export to csv file for the website
+df_combined.to_csv('data/cluster_enrichment_table.csv', index=False)
+
