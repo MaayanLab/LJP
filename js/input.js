@@ -47,7 +47,7 @@ $.getJSON(config['ENTER_POINT']+'/ccle', function(meta){
 		// plugins: ['optgroup_columns']
 		onChange: function(cell){ // cell line selected
 			console.log(cell)
-			$.getJSON('/LJP/ccle?cell='+cell, function(data){
+			$.getJSON(config['ENTER_POINT'] + '/ccle?cell='+cell, function(data){
 				fillSignature(data);
 			});
 		},
@@ -65,7 +65,7 @@ $.getJSON(config['ENTER_POINT']+'/diseases', function(meta){
 
 		onChange: function(disease){ // disease selected
 			console.log(disease)
-			$.getJSON('/LJP/diseases?disease='+disease, function(data){
+			$.getJSON(config['ENTER_POINT'] + '/diseases?disease='+disease, function(data){
 				fillSignature(data);
 			});
 		},

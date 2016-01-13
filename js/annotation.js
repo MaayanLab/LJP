@@ -1,3 +1,5 @@
+d3.select("#downloadTable").attr('href', config['ENRICH_TABLE_PATH']);
+
 // config params
 var w = $("#svg_container").innerWidth();
 var h = w/2;

@@ -2,5 +2,7 @@
 	"mongoURI": "mongodb://10.90.122.109:27017/",
 	"RURL" : "http://146.203.54.71:31164/custom/SigineLJP",
 	"LJP_NET_PATH" : "data/harvard_net_with_pos_Cidx_enriched_terms_combined_score.json",
+	"LJP_NET_PATH0" : "data/harvard_net_with_pos.json",
+	"ENRICH_TABLE_PATH": "data/cluster_enrichment_table.csv",
 	"ENTER_POINT": "/LJP"
 }

@@ -139,7 +139,7 @@ var tooltip = d3.select("body").append("div")
 
 // svg.style("cursor","move");
 
-var graph_fn = "data/harvard_net_with_pos_Cidx_enriched_terms_combined_score.json";
+var graph_fn = config["LJP_NET_PATH"];
 d3.json(graph_fn, function(error, graph) {
 	// to get the extent of x and y from the data
 	x.domain(d3.extent(graph.nodes, function(d) { return d.position.x; })).nice();

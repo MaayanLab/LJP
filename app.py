@@ -14,7 +14,7 @@ app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 6
 ## global variables
 TABLE = load_enrichment_table()
 NET = load_LJP_net()
-NET0 = load_LJP_net(net_path='data/harvard_net_with_pos.json') # the network without cluster enrichment
+NET0 = load_LJP_net(net_path=CONFIG['LJP_NET_PATH0']) # the network without cluster enrichment
 CCLE = CCLESignatureCollection()
 DISEASES = DiseaseSignatureCollection()
 

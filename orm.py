@@ -32,7 +32,7 @@ def load_LJP_net(net_path=None):
 	return net
 
 def load_enrichment_table():
-	df = pd.read_csv('data/cluster_enrichment_table.csv')
+	df = pd.read_csv(CONFIG['ENRICH_TABLE_PATH'])
 	df.columns = ['Cidx', 'terms', 'RA', 'library', 'direction']
 	return df
 
