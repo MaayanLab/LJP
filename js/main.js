@@ -44,7 +44,23 @@ function convertName (name) {
 var controlAttrs = {
 	shapeAttr: ["CellLine", 'Time', "Conc"],
 	colorAttr: ["Enrichment score", "DrugClass","Cidx", "CellLine", "pathway_role", "cellular_function", "Conc", "Time",
-		"GRvalue", "-logPvalue"],
+		"GRvalue", "-logPvalue",
+'ChEA_2015|up', 
+'KEGG_2015|up', 
+'KEA_2015|up', 
+'MGI_Mammalian_Phenotype_Level_4|up', 
+'Epigenomics_Roadmap_HM_ChIP-seq|up', 
+'ENCODE_TF_ChIP-seq_2015|up', 
+'GO_Biological_Process_2015|up', 
+'ChEA_2015|dn', 
+'KEGG_2015|dn', 
+'KEA_2015|dn', 
+'MGI_Mammalian_Phenotype_Level_4|dn', 
+'Epigenomics_Roadmap_HM_ChIP-seq|dn', 
+'ENCODE_TF_ChIP-seq_2015|dn', 
+'GO_Biological_Process_2015|dn', 
+
+		],
 	sizeAttr: ["GRvalue", "-logPvalue", "Time", "Conc"],
 }
 
