@@ -1,8 +1,3 @@
-$(document).ready(function(){
-	$("#controlers").draggable({cursor: "move"});
-	$("#table").draggable({cursor: "move"});
-})
-
 // config params
 var w = $("#svg_container").innerWidth();
 var h = w/2;
@@ -349,6 +344,7 @@ d3.json(config['ENTER_POINT'] + '/annotation', function(controlAttrs){
 				// .attr("class", "well");
 
 			var getParams = $.param(params);
+			console.log(params)
 			// to get table using params:
 			d3.json(config['ENTER_POINT'] + '/annotation?' + getParams, function(tableData){
 				// display table on DOM

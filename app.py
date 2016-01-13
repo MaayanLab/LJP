@@ -114,7 +114,7 @@ def annotation():
 	'''
 	if request.method == 'GET':
 		## GET args
-		cidx = int(request.args.get('cidx', 1))
+		cidx = int(request.args.get('Cidx', 1))
 		library = request.args.get('library', None)
 		direction = request.args.get('direction', None)
 
