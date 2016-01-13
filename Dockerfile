@@ -1,7 +1,12 @@
 FROM python:2.7
 
-# Install required python packages:
-RUN pip install pymongo Flask requests networkx pandas
+# Install numpy and pandas
+RUN apt-get update && apt-get install -y libatlas-base-dev gfortran
+RUN pip install numpy 
+RUN pip install pandas==0.16.0
+
+# Install other required python packages:
+RUN pip install pymongo Flask requests networkx
 
 # Copy the application folder inside the container
 ADD . /my_application
