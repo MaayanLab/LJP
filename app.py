@@ -11,8 +11,10 @@ app = Flask(__name__, static_url_path=ENTER_POINT, static_folder=os.getcwd())
 app.debug = True
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 6
 
+## global variables
 TABLE = load_enrichment_table()
 NET = load_LJP_net()
+NET0 = load_LJP_net(net_path='data/harvard_net_with_pos.json') # the network without cluster enrichment
 CCLE = CCLESignatureCollection()
 DISEASES = DiseaseSignatureCollection()
 
@@ -20,6 +22,15 @@ DISEASES = DiseaseSignatureCollection()
 def root():
 	return app.send_static_file('index.html') 
 	## should have front-end routing for home.html and result.html
+
+@app.route(ENTER_POINT + '/net0', methods=['GET'])
+def net0():
+	'''
+	Serve the json_graph for NET0
+	'''
+	if request.method == 'GET':
+		net_data = json_graph.node_link_data(NET0)
+		return json.dumps(net_data)	
 
 @app.route(ENTER_POINT + '/enrich', methods=['POST'])
 def enrich():
@@ -110,19 +121,19 @@ def annotation():
 		if None in (cidx, library, direction): # output meta
 			meta = {}
 			for col in TABLE.columns:
-				if col not in ('Enriched Terms', 'Rank Average', 'Library'):
+				if col not in ('terms', 'RA', 'library'):
 					meta[col] = TABLE[col].unique().tolist()
 			## reorder libraries
-			meta['Library'] = ['GO_Biological_Process', 'KEGG_2015', 'MGI_Mammalian_Phenotype', 
+			meta['library'] = ['GO_Biological_Process', 'KEGG_2015', 'MGI_Mammalian_Phenotype', 
 				'ChEA_2015', 'ENCODE_TF', 'KEA_2015', 'Epigenomics_Roadmap_HM']
 			return json.dumps(meta)
 		else: # output subset of table
 			sub_table = TABLE.loc[
-				(TABLE['Cluster Index'] == cidx) &
-				(TABLE['Library'] == library) &
-				(TABLE['Direction'] == direction)
-			, :][['Enriched Terms', 'Rank Average']]
-			return sub_table.to_json()
+				(TABLE['Cidx'] == cidx) &
+				(TABLE['library'] == library) &
+				(TABLE['direction'] == direction)
+			, :][['terms', 'RA']]
+			return sub_table.to_json(orient='records')
 
 
 

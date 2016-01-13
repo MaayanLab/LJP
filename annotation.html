@@ -1,6 +1,14 @@
-<div class="row">
-	<div class="col-xs-10" id="svg_container"></div>
-	<div class="col-xs-2"><div id="controlers"></div></div>
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-sm-8" id="svg_container"></div>
+		<div class="col-sm-4 well">
+			<div class="row" id="controlers"></div>
+			<hr>
+			<h4>Top enriched terms:</h4>
+			<div class="row" id="table"></div>
+			<a href="data/cluster_enrichment_table.csv" download>Download the full enrichment table</a>
+		</div>
+	</div>
 </div>
 <script src="lib/d3-legend.min.js"></script>
 <script src="js/annotation.js"></script>

@@ -22,7 +22,9 @@ COLL_RES = DB['userResults']
 RURL = CONFIG['RURL'] # URL for the Rook server doing enrichments
 LJP_NET_PATH = CONFIG['LJP_NET_PATH']
 
-def load_LJP_net():
+def load_LJP_net(net_path=None):
+	if net_path is None:
+		net_path = LJP_NET_PATH
 	data = json.load(open(LJP_NET_PATH, 'rb'))
 	net = json_graph.node_link_graph(data)
 	## remove all links since they are not required for visualization
@@ -31,6 +33,7 @@ def load_LJP_net():
 
 def load_enrichment_table():
 	df = pd.read_csv('data/cluster_enrichment_table.csv')
+	df.columns = ['Cidx', 'terms', 'RA', 'library', 'direction']
 	return df
 
 class EnrichmentResult(object):

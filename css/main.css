@@ -78,6 +78,9 @@ html {
   margin:0;
   padding: 10px;
 }
+.list-inline li:last-child:after{
+  content: '';
+}
 
 .title {
   display: inline-block;
