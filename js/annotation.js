@@ -48,7 +48,7 @@ var readableMap = {
 	SRC_family: 'SRC family',
 	DNA_repair: 'DNA repair',
 	terms: 'Enriched terms',
-	RA: 'Rank Average'
+	RA: 'Average Rank'
 }
 
 function convertName (name) {
@@ -356,7 +356,7 @@ d3.json(config['ENTER_POINT'] + '/annotation', function(controlAttrs){
 				// add table header
 				var keys = _.keys(tableData[0]);
 				for (var i = 0; i < keys.length; i++) {
-					th.append('td').text(convertName(keys[i]));
+					th.append('th').text(convertName(keys[i]));
 				};
 				// add table data
 				var tbody = table.append('tbody');
