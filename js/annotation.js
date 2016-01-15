@@ -48,7 +48,9 @@ var readableMap = {
 	SRC_family: 'SRC family',
 	DNA_repair: 'DNA repair',
 	terms: 'Enriched terms',
-	RA: 'Average Rank'
+	RA: 'Average Rank',
+	direction: 'Direction',
+	library: 'Library'
 }
 
 function convertName (name) {
