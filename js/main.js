@@ -279,9 +279,13 @@ d3.json(config['ENTER_POINT'] + '/result?id=' + rid, function(error, graph) {
 		// return global variables: [size, shape, shapeL, color, legendColor]
 		// get extent for sizes	
 		var sizeExtent = d3.extent(graph.nodes, function(d){ return d[sizeAttr]});
-		size = d3.scale.linear()
-			.domain(sizeExtent)
-			.range([0.1,4])
+		if (sizeAttr === 'Conc') {
+			size = d3.scale.log();
+		} else{
+			size = d3.scale.linear();
+		};
+		size.domain(sizeExtent)
+			.range([1,4])
 			.nice();
 
 		// get uniq_categories for shapes
@@ -307,7 +311,7 @@ d3.json(config['ENTER_POINT'] + '/result?id=' + rid, function(error, graph) {
 			} else{
 				var center_score = (min_score+max_score)/2; 
 			};
-			color = d3.scale.linear()
+			color = d3.scale.pow()
 				.domain([min_score, center_score, max_score])
 				.range(["#1f77b4", "white", "#d62728"]);
 			legendColor = d3.legend.color()
@@ -380,11 +384,7 @@ d3.json(config['ENTER_POINT'] + '/result?id=' + rid, function(error, graph) {
 		setUpScales(shapeAttr, colorAttr, sizeAttr);
 
 		// 2. update the node circles
-		circle.attr("d", d3.svg.symbol()
-			.size(function(d) { return Math.PI*Math.pow(size(d[sizeAttr])||nominal_base_node_size,2); })
-			.type(function(d) { return shape(d[shapeAttr]); })
-			)
-		.style("fill", function(d) {
+		circle.style("fill", function(d) {
 			return color(d[colorAttr]);
 		});
 

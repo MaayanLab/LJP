@@ -83,6 +83,8 @@ var svg = d3.select("#svg_container").append("svg");
 var zoom = d3.behavior.zoom().scaleExtent([min_zoom,max_zoom])
 var g = svg.append("g");
 
+var sizeRange = [1, 4];
+
 // Create DOMs for legend
 var legendG = svg.append("g")
 	.attr("class", "legend")
@@ -168,7 +170,7 @@ d3.json(graph_fn, function(error, graph) {
 		var colorExtent = d3.extent(graph.nodes, function(d) { return d[colorAttr]; });
 		var min_score = colorExtent[0],
 			max_score = colorExtent[1];
-		var color = d3.scale.linear()
+		var color = d3.scale.pow()
 			.domain([min_score, (min_score+max_score)/2, max_score])
 			.range(["#1f77b4", "white", "#d62728"]);
 		var legendColor = d3.legend.color()
@@ -199,7 +201,7 @@ d3.json(graph_fn, function(error, graph) {
 	// console.log(sizeExtent);
 	var size = d3.scale.linear()
 		.domain(sizeExtent)
-		.range([0.1,4])
+		.range(sizeRange)
 		.nice();
 
 	// set up legend
@@ -289,7 +291,7 @@ d3.json(graph_fn, function(error, graph) {
 			var colorExtent = d3.extent(graph.nodes, function(d) { return d[colorAttr]; });
 			var min_score = colorExtent[0],
 				max_score = colorExtent[1];
-			var color = d3.scale.linear()
+			var color = d3.scale.pow()
 				.domain([min_score, (min_score+max_score)/2, max_score])
 				.range(["#1f77b4", "white", "#d62728"]);
 			var legendColor = d3.legend.color()
@@ -314,7 +316,10 @@ d3.json(graph_fn, function(error, graph) {
 		} 		
 
 		var sizeExtent = d3.extent(graph.nodes, function(d){ return d[sizeAttr]});
-		size.domain(sizeExtent)
+		if (sizeAttr === 'Conc') {
+			size = d3.scale.log().range(sizeRange);
+		};
+		size.domain(sizeExtent);
 
 		// 2. update the node circles
 		circle.attr("d", d3.svg.symbol()
@@ -409,10 +414,10 @@ d3.json(graph_fn, function(error, graph) {
 
 		var base_radius = nominal_base_node_size;
 		if (nominal_base_node_size*zoom.scale()>max_base_node_size) base_radius = max_base_node_size/zoom.scale();
-		circle.attr("d", d3.svg.symbol()
-			.size(function(d) { return Math.PI*Math.pow(size(d[sizeAttr])*base_radius/nominal_base_node_size||base_radius,2); })
-			.type(function(d) { return shape(d[shapeAttr]); })
-			)
+		// circle.attr("d", d3.svg.symbol()
+		// 	.size(function(d) { return Math.PI*Math.pow(size(d[sizeAttr])*base_radius/nominal_base_node_size||base_radius,2); })
+		// 	.type(function(d) { return shape(d[shapeAttr]); })
+		// 	)
 			
 		if (!text_center) text.attr("dx", function(d) { return (size(d[sizeAttr])*base_radius/nominal_base_node_size||base_radius); });
 		

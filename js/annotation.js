@@ -161,7 +161,7 @@ d3.json(config['ENTER_POINT'] + '/annotation', function(controlAttrs){
 		// console.log(sizeExtent);
 		var size = d3.scale.linear()
 			.domain(sizeExtent)
-			.range([0.1,4])
+			.range([1,4])
 			.nice();
 
 		// set up legend
