@@ -313,7 +313,7 @@ d3.json(config['ENTER_POINT'] + '/result?id=' + rid, function(error, graph) {
 			};
 			color = d3.scale.pow()
 				.domain([min_score, center_score, max_score])
-				.range(["#1f77b4", "white", "#d62728"]);
+				.range(["#1f77b4", "#ddd", "#d62728"]);
 			legendColor = d3.legend.color()
 				.title(colorAttr)
 				.shapeWidth(20)

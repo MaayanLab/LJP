@@ -172,7 +172,7 @@ d3.json(graph_fn, function(error, graph) {
 			max_score = colorExtent[1];
 		var color = d3.scale.pow()
 			.domain([min_score, (min_score+max_score)/2, max_score])
-			.range(["#1f77b4", "white", "#d62728"]);
+			.range(["#1f77b4", "#ddd", "#d62728"]);
 		var legendColor = d3.legend.color()
 			.title(colorAttr)
 			.shapeWidth(20)
@@ -293,7 +293,7 @@ d3.json(graph_fn, function(error, graph) {
 				max_score = colorExtent[1];
 			var color = d3.scale.pow()
 				.domain([min_score, (min_score+max_score)/2, max_score])
-				.range(["#1f77b4", "white", "#d62728"]);
+				.range(["#1f77b4", "#ddd", "#d62728"]);
 			var legendColor = d3.legend.color()
 				.title(colorAttr)
 				.shapeWidth(20)
