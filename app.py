@@ -147,4 +147,4 @@ if __name__ == '__main__':
 	else:
 		host = '127.0.0.1'
 
-	app.run(host=host, port=port)
+	app.run(host=host, port=port, threaded=True)
