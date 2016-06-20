@@ -47,7 +47,7 @@ html {
   padding: 0 0 60px;
 }
 
-.footer {
+/*.footer {
   bottom: 0px;
   height: 60px;
   width: 100%;
@@ -61,11 +61,41 @@ html {
   background: #f2f2f2;
 }
 .footer-wrapper {
-  /*width: 540px;*/
   margin-top: 20px;
   display: flex;
   justify-content: space-between;
 }
+*/
+#footer {
+  background: #2a2730;
+  height: 250px;
+  margin-top: 20px;
+  padding: 20px 0 30px 0;
+}
+#footer h4 {
+  color: #fff;
+}
+
+#footer ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+#footer a,
+#footer p {
+  color: white;
+}
+#footer a:hover {
+  color: white;
+}
+#footer p {
+  line-height: 90%;
+}
+#footer img {
+  height: 30px;
+  margin: 0 5px;
+}
+
 .list-inline{
   display:block;
 }
