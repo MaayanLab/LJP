@@ -1,146 +1,260 @@
+/*
+ * Blue: rgb(25, 118, 210)
+ */
+
 body {
-	/*overflow:hidden;*/
-	margin:0;
-  height: 100%;
+    margin: 0;
+    height: 100%;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: "Roboto", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
 }
 
 text {
-	font-family: sans-serif;
-	pointer-events: none;
+    font-family: sans-serif;
+    pointer-events: none;
 }
 
+.navbar {
+    background-color: rgb(25, 118, 210);
+    border-radius: 0;
+}
+
+.navbar .navbar-title {
+    font-family: "Roboto", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+    font-weight: 200;
+}
+
+.navbar #title a,
+.navbar #subtitle,
+.navbar .navbar-nav > li > a {
+    color: white;
+}
+
+.navbar #title a:hover,
+.navbar #title a:active,
+.navbar #title a:visited,
+.navbar #title a:focus {
+    text-decoration: none;
+}
+
+.nav > li > a:hover,
+.nav > li > a:focus {
+    background-color: rgb(25, 118, 210);
+}
+
+.navbar #subtitle {
+    font-size: 16px;
+}
+
+.navbar .nav {
+    position: relative;
+    top: 52px;
+    font-size: 16px;
+    font-weight: 200;
+}
 
 .tooltip {
-	position: absolute;
-	width: 200px;
-	pointer-events: none;
-	background-color: #eee;
+    position: absolute;
+    width: 200px;
+    pointer-events: none;
+    background-color: #eee;
 }
 
-#controlers {
-	cursor: move;
+#controls {
+    cursor: move;
 }
 
 .highlight {
-	fill: yellow;
-	opacity: 0.25;
+    fill: yellow;
+    opacity: 0.25;
+}
+
+.alert {
+    border-color: #0262C2;
+    border-width: 2px;
+    background: #E3F2FD;
+}
+
+.btn {
+    border-radius: 0;
+    border: none;
+}
+
+.btn.btn-default {
+    background-color: #eee;
+    color: rgb(25, 118, 210);
+}
+
+.btn.btn-default:hover {
+    background-color: #ddd;
+}
+
+.btn.btn-info {
+    background-color: rgba(25, 118, 210, 0.8);
+}
+
+.btn.btn-info:hover {
+    background-color: rgba(25, 118, 210, 1);
 }
 
 .theme-color {
-  color: #3593b1;
+    color: #3593b1;
 }
+
 .theme-color-dark {
-  color: #09505b;
-  font-family: 'Arial', sans-serif;
+    color: #09505b;
+    font-family: 'Arial', sans-serif;
 }
+
 html {
-  position: relative;
-  /*min-height: 100%;*/
-  height: 100%;
-}
-#page-content {
-  min-height: 100%;
-  height: auto;
-  /* Negative indent footer by its height */
-  margin: 0 auto -60px;
-  /* Pad bottom by footer height */
-  padding: 0 0 60px;
+    position: relative;
+    /*min-height: 100%;*/
+    height: 100%;
 }
 
-/*.footer {
-  bottom: 0px;
-  height: 60px;
-  width: 100%;
-  display: flex;
-  flex-flow: row;
-  justify-content: space-around;
-  align-content: center;
-  border-top-width: 1px;
-  border-top-style: solid;
-  border-top-color: #e4e4e4;
-  background: #f2f2f2;
+#page {
+    /*min-height: 100%;*/
+    height: 1000px;
+    /* Negative indent footer by its height */
+    margin: 0 auto -60px;
+    /* Pad bottom by footer height */
+    padding: 0 0 60px;
 }
-.footer-wrapper {
-  margin-top: 20px;
-  display: flex;
-  justify-content: space-between;
+
+#page svg {
+    border: 1px solid #eee;
+    padding: 20px;
 }
-*/
+
+#page #visualization {
+    position: relative;
+}
+
+#page #visualization #controls {
+    background-color: #eee;
+    padding: 10px;
+    position: absolute;
+    opacity: .7;
+    top: 10px;
+    right: 10px;
+}
+
+#page #visualization #controls label,
+#page #visualization #controls select {
+    font-size: 13px;
+}
+
 #footer {
-  background: #2a2730;
-  height: 250px;
-  margin-top: 20px;
-  padding: 20px 0 30px 0;
-}
-#footer h4 {
-  color: #fff;
+    background: #1a2326;
+    height: 200px;
+    margin-top: 20px;
+    padding: 20px 0 30px 0;
 }
 
-#footer ul {
-  list-style-type: none;
-  padding: 0;
+#search-page label {
+    font-family: "Roboto", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+    font-size: 20px;
+    font-weight: 200;
+}
+
+#footer h4,
+#footer a,
+#footer p {
+    color: white;
+    font-family: "Roboto", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+    opacity: .87;
 }
 
 #footer a,
 #footer p {
-  color: white;
-}
-#footer a:hover {
-  color: white;
-}
-#footer p {
-  line-height: 90%;
-}
-#footer img {
-  height: 30px;
-  margin: 0 5px;
+    font-weight: 200;
 }
 
-.list-inline{
-  display:block;
+#footer ul {
+    list-style-type: none;
+    padding: 0;
 }
-.list-inline li{
-  display:inline-block;
-  padding: 0px;
+
+#footer p {
+    line-height: 25px;
 }
-.list-inline li:after{
-  content:'|'; 
-  margin:0;
-  padding: 10px;
+
+#footer a:hover {
+    color: white;
 }
-.list-inline li:last-child:after{
-  content: '';
+
+#footer p {
+    line-height: 90%;
+}
+
+#footer h4 {
+    text-transform: uppercase;
+}
+
+#footer img {
+    height: 30px;
+    margin: 0 5px;
+}
+
+.list-inline {
+    display: block;
+}
+
+.list-inline li {
+    display: inline-block;
+    padding: 0px;
+}
+
+.list-inline li:after {
+    content: '|';
+    margin: 0;
+    padding: 10px;
+}
+
+.list-inline li:last-child:after {
+    content: '';
 }
 
 .title {
-  display: inline-block;
+    display: inline-block;
 }
+
 .logo-title {
-  vertical-align: 60%;
-  /*margin-left: 10px;*/
+    vertical-align: 60%;
+    /*margin-left: 10px;*/
 }
+
 .bd2k {
-  color: #808080;
-  font-size: 0.8em;
+    color: #808080;
+    font-size: 0.8em;
 }
 
 /*two lines in the brand*/
 .navbar-brand {
-  -ms-transform: translateY(-35px);
-  -o-transform: translateY(-35px);
-  -moz-transform: translateY(-35px);
-  -webkit-transform: translateY(-35px);
-  transform: translateY(-35px);
+    -ms-transform: translateY(-35px);
+    -o-transform: translateY(-35px);
+    -moz-transform: translateY(-35px);
+    -webkit-transform: translateY(-35px);
+    transform: translateY(-35px);
 }
+
 @media (min-width: 768px) {
-  header .navbar-default {
-    padding: 20px;
-  }
-  .navbar-brand {
-    -ms-transform: translateY(-7px);
-    -o-transform: translateY(-7px);
-    -moz-transform: translateY(-7px);
-    -webkit-transform: translateY(-7px);
-    transform: translateY(-7px);
-  }
+    header .navbar-default {
+        padding: 20px;
+    }
+
+    .navbar-brand {
+        -ms-transform: translateY(-7px);
+        -o-transform: translateY(-7px);
+        -moz-transform: translateY(-7px);
+        -webkit-transform: translateY(-7px);
+        transform: translateY(-7px);
+    }
 }

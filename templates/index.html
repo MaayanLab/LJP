@@ -1,0 +1,23 @@
+{% include 'header.html' %}
+
+<div class="container">
+    {% if description %}
+        <div class="alert alert-info">
+            {{ description|safe }}
+        </div>
+    {% endif %}
+    <div id="page">
+        <div id="visualization">
+            <div id="svg_container"></div>
+            <div id="controls"></div>
+        </div>
+    </div>
+</div>
+
+<script src="lib/d3-legend.min.js"></script>
+<script src="js/{{ script }}.js"></script>
+<script>
+    render_graph({{ graph|safe }});
+</script>
+
+{% include 'footer.html' %}

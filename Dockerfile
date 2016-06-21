@@ -18,5 +18,5 @@ EXPOSE 5000
 WORKDIR /my_application
 
 # Set the default command to execute
-# when creating a new container
+# when creating a new containerwebst
 CMD python app.py 5000 0.0.0.0

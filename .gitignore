@@ -3,3 +3,5 @@ dump/
 .DS_Store
 .ipynb_checkpoints
 *.ipynb
+venv/
+.gp-excludes

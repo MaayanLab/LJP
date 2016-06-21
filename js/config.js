@@ -11,4 +11,4 @@ var config = (function () {
         }
     });
     return config;
-})(); 
+})();
