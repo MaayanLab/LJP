@@ -48,28 +48,29 @@ def annotation_page():
                            description=description,
                            script='annotation')
 
-    # if request.method == 'GET':
-    #     # GET args
-    #     cidx = int(request.args.get('Cidx', 1))
-    #     library = request.args.get('library', None)
-    #     direction = request.args.get('direction', None)
-    #
-    #     if None in (cidx, library, direction):  # output meta
-    #         meta = {}
-    #         for col in TABLE.columns:
-    #             if col not in ('terms', 'RA', 'library'):
-    #                 meta[col] = TABLE[col].unique().tolist()
-    #         # reorder libraries
-    #         meta['library'] = ['GO_Biological_Process', 'KEGG_2015', 'MGI_Mammalian_Phenotype',
-    #                            'ChEA_2015', 'ENCODE_TF', 'KEA_2015', 'Epigenomics_Roadmap_HM']
-    #         return json.dumps(meta)
-    #     else:  # output subset of table
-    #         sub_table = TABLE.loc[
-    #                     (TABLE['Cidx'] == cidx) &
-    #                     (TABLE['library'] == library) &
-    #                     (TABLE['direction'] == direction)
-    #         , :][['terms', 'RA']]
-    #         return sub_table.to_json(orient='records')
+
+@app.route(ENTER_POINT + '/controls', methods=['GET'])
+def controls_api():
+    cidx = int(request.args.get('Cidx', 1))
+    library = request.args.get('library', None)
+    direction = request.args.get('direction', None)
+
+    if None in (cidx, library, direction):  # output meta
+        meta = {}
+        for col in TABLE.columns:
+            if col not in ('terms', 'RA', 'library'):
+                meta[col] = TABLE[col].unique().tolist()
+        # reorder libraries
+        meta['library'] = ['GO_Biological_Process', 'KEGG_2015', 'MGI_Mammalian_Phenotype',
+                           'ChEA_2015', 'ENCODE_TF', 'KEA_2015', 'Epigenomics_Roadmap_HM']
+        return json.dumps(meta)
+    else:  # output subset of table
+        sub_table = TABLE.loc[
+                    (TABLE['Cidx'] == cidx) &
+                    (TABLE['library'] == library) &
+                    (TABLE['direction'] == direction)
+        , :][['terms', 'RA']]
+        return sub_table.to_json(orient='records')
 
 
 # should have front-end routing for home.html and result.html
@@ -78,40 +79,38 @@ def net0():
     """
     Serve the json_graph for NET0
     """
-    if request.method == 'GET':
-        net_data = json_graph.node_link_data(NET0)
-        return json.dumps(net_data)
+    net_data = json_graph.node_link_data(NET0)
+    return json.dumps(net_data)
 
 
 @app.route(ENTER_POINT + '/enrich', methods=['POST'])
-def enrich():
+def enrich_api():
     """
     POST request data to SigineLJP and combine enrichment result
     with network layout.
     """
-    if request.method == 'POST':
-        # data = json.loads(request.data)
-        if request.form['method'] == 'geneSet':
-            up_genes = request.form['upGenes'].split()
-            dn_genes = request.form['dnGenes'].split()
-            # print up_genes
-            # print dn_genes
-            user_input = GeneSets(up_genes, dn_genes)
-        elif request.form['method'] == 'CD':
-            genes_vals = request.form['signature'].split()
-            genes = []
-            vals = []
-            for gv in genes_vals:
-                gene, val = gv.split(',')
-                genes.append(gene)
-                vals.append(float(val))
-            # print genes
-            user_input = Signature(genes, vals)
+    # data = json.loads(request.data)
+    if request.form['method'] == 'geneSet':
+        up_genes = request.form['upGenes'].split()
+        dn_genes = request.form['dnGenes'].split()
+        # print up_genes
+        # print dn_genes
+        user_input = GeneSets(up_genes, dn_genes)
+    elif request.form['method'] == 'CD':
+        genes_vals = request.form['signature'].split()
+        genes = []
+        vals = []
+        for gv in genes_vals:
+            gene, val = gv.split(',')
+            genes.append(gene)
+            vals.append(float(val))
+        # print genes
+        user_input = Signature(genes, vals)
 
-        # POST to SigineLJP to do the enrichment
-        res = user_input.enrich()
-        # save user input and enrichment results to db and get a result id
-        rid = user_input.save()
+    # POST to SigineLJP to do the enrichment
+    res = user_input.enrich()
+    # save user input and enrichment results to db and get a result id
+    rid = user_input.save()
     return redirect(ENTER_POINT + '/result/' + rid, code=302)
 
 

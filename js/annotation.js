@@ -3,8 +3,9 @@ function render_graph(graph) {
 	d3.select("#downloadTable").attr('href', config['ENRICH_TABLE_PATH']);
 
 	// config params
-	var w = $("#page").width();
-	var h = w / 2;
+    var $page = $('#page');
+	var w = $page.width();
+	var h = $page.height();
 
 	// function for positions
 	var x = d3.scale.linear().range([0, w]);
@@ -24,9 +25,8 @@ function render_graph(graph) {
 	var min_zoom = 0.1;
 	var max_zoom = 20;
 	var svg = d3.select("#svg_container").append("svg");
-	var zoom = d3.behavior.zoom().scaleExtent([min_zoom, max_zoom])
+	var zoom = d3.behavior.zoom().scaleExtent([min_zoom, max_zoom]);
 	var g = svg.append("g");
-
 
 	// for user to read
 	var readableMap = {
@@ -49,7 +49,7 @@ function render_graph(graph) {
 		RA: 'Average Rank',
 		direction: 'Direction',
 		library: 'Library'
-	}
+	};
 
 	function convertName(name) {
 		if (readableMap.hasOwnProperty(name)) {
@@ -59,14 +59,13 @@ function render_graph(graph) {
 	}
 
 	function getParamsFromControler() {
-		var params = {}
+		var params = {};
 		var keys = ['Cidx', 'direction', 'library'];
 		for (var i = 0; i < keys.length; i++) {
 			var key = keys[i];
 			var val = d3.select("#" + key).property("value");
 			params[key] = val;
 		}
-		;
 		return params;
 	}
 
@@ -88,11 +87,10 @@ function render_graph(graph) {
 		.attr("transform", "translate(0, 260)");
 
 	// Create DOM for controls
-	var controls = d3.select("#controls")
-		.attr("class", "form-horizontal");
+	var controls = d3.select("#controls");
 
 	// get attributes for controls
-	d3.json(config['ENTER_POINT'] + '/annotation', function (controlAttrs) {
+	d3.json(config['ENTER_POINT'] + '/controls', function (controlAttrs) {
 		// create DOMs for controlAttrs and get params
 		var params = _.mapObject(controlAttrs, function (val, key) {
 			var div = controls.append("div")
@@ -105,7 +103,6 @@ function render_graph(graph) {
 				s.append("option").text(convertName(item))
 					.attr("value", item);
 			}
-			;
 			return val[0];
 		});
 
@@ -156,7 +153,7 @@ function render_graph(graph) {
 				.domain(colorDomain)
 				.range(_.map(colorDomain, function (i) {
 					return colors2[i];
-				}))
+				}));
 			var legendColor = d3.legend.color()
 				.title(colorAttr)
 				.shape("path", d3.svg.symbol().type("circle").size(30)())
@@ -181,7 +178,7 @@ function render_graph(graph) {
 			var legendShape = d3.legend.symbol()
 				.scale(shapeL)
 				.orient("vertical")
-				.title(shapeAttr)
+				.title(shapeAttr);
 			svg.select("#legendShape")
 				.call(legendShape);
 
@@ -290,14 +287,15 @@ function render_graph(graph) {
 				redraw(cidxToHighlight);
 				// drawTable
 				drawTable(params);
-			})
+			});
 
 			function resize() {
-				var width = window.innerWidth, height = window.innerHeight;
+				var width = $page.width(),
+                    height = $page.height();
 				svg.attr("width", width).attr("height", height);
 				w = width;
 				h = height;
-			};
+			}
 
 			function zoomed() {
 				var stroke = nominal_stroke;
@@ -314,8 +312,7 @@ function render_graph(graph) {
 					.type(function (d) {
 						return shape(d[shapeAttr]);
 					})
-				)
-
+				);
 				if (!text_center) text.attr("dx", function (d) {
 					return (size(d[sizeAttr]) * base_radius / nominal_base_node_size || base_radius);
 				});
@@ -333,10 +330,9 @@ function render_graph(graph) {
 				} else {
 					text.attr("display", "none");
 				}
-				;
 
 				g.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
-			};
+			}
 
 			// zoom out a little to display the whole view
 			var factor = 0.8;
@@ -349,11 +345,10 @@ function render_graph(graph) {
 				.translate(
 					[c[0] + (t[0] - c[0]) / scale * newScale,
 						c[1] + (t[1] - c[1]) / scale * newScale])
-				.event(svg.transition().duration(0))
+				.event(svg.transition().duration(0));
 
 			function zoomByFactor(factor) { // for zooming svg after button click
 				var scale = d3.transform(g.attr("transform")).scale[0];
-				;
 				var extent = [min_zoom, max_zoom];
 				var newScale = scale * factor;
 				if (extent[0] <= newScale && newScale <= extent[1]) {
@@ -365,32 +360,35 @@ function render_graph(graph) {
 								c[1] + (t[1] - c[1]) / scale * newScale])
 						.event(svg.transition().duration(350));
 				}
-			};
-
+			}
 
 			function drawTable(params) {
-				// send a GET request with params and draw table using response
-				var el = "#table";
 
+                $('#controls').append(
+                    '<h4>Top enriched terms:</h4>' +
+                    '<div id="table"></div>' +
+                    '<a id="downloadTable" href="data/cluster_enrichment_table.csv" download>Download the full enrichment table</a>'
+                );
+
+				// send a GET request with params and draw table using response
 				d3.select("#table-div").remove();
-				var div = d3.select(el).append("div")
-					.attr("id", 'table-div')
+				var div = d3.select("#table").append("div")
+					.attr("id", 'table-div');
 				// .attr("class", "well");
 
 				var getParams = $.param(params);
 				// console.log(params)
 				// to get table using params:
-				d3.json(config['ENTER_POINT'] + '/annotation?' + getParams, function (tableData) {
+				d3.json(config['ENTER_POINT'] + '/controls?' + getParams, function (tableData) {
 					// display table on DOM
 					var table = div.append('table')
-						.attr('class', 'table table-hover table-striped table-condensed')
+						.attr('class', 'table table-hover table-striped table-condensed');
 					var th = table.append('thead').append('tr');
 					// add table header
 					var keys = _.keys(tableData[0]);
 					for (var i = 0; i < keys.length; i++) {
 						th.append('th').text(convertName(keys[i]));
 					}
-					;
 					// add table data
 					var tbody = table.append('tbody');
 					var trs = tbody.selectAll('tr').data(tableData)
@@ -405,10 +403,6 @@ function render_graph(graph) {
 				});
 
 			}
-
-
 		});// end of d3.json('/net0') block
-
-
 	}); // end of d3.json('/annotation') block
 }
