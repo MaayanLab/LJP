@@ -363,15 +363,17 @@ function render_graph(graph) {
 			}
 
 			function drawTable(params) {
-
+				// clear the table before loading new ones
+				d3.select("#enrichment-table-wrapper").remove();
                 $('#controls').append(
-                    '<h4>Top enriched terms:</h4>' +
-                    '<div id="table"></div>' +
-                    '<a id="downloadTable" href="data/cluster_enrichment_table.csv" download>Download the full enrichment table</a>'
+                	'<div id="enrichment-table-wrapper">' +
+	                    '<h4>Top enriched terms:</h4>' +
+	                    '<div id="table"></div>' +
+	                    '<a id="downloadTable" href="data/cluster_enrichment_table.csv" download>Download the full enrichment table</a>' +
+                    '</div>'
                 );
 
 				// send a GET request with params and draw table using response
-				d3.select("#table-div").remove();
 				var div = d3.select("#table").append("div")
 					.attr("id", 'table-div');
 				// .attr("class", "well");
