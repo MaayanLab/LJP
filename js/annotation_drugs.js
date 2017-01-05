@@ -253,7 +253,7 @@ function render_graph(graph) {
 						return (size(d[sizeAttr]) || nominal_base_node_size);
 					})
 					.text(function (d) {
-						return '\u2002' + d["Drug"];
+						return '\u2002' + d["DrugName"];
 					});
 
 
@@ -293,13 +293,15 @@ function render_graph(graph) {
 			$("#Drug").selectize({
 				create: false,
 				sortField: 'text',
-				onChange: function(e){
-					// get new params from select
-					params = getParamsFromControler();
-					var cidxToHighlight = params["Drug"];
-					redraw(cidxToHighlight);
-					// drawTable
-					drawTable(params);
+				onChange: function(value){
+					if (value !== '') { // when delete
+						// get new params from select
+						params = getParamsFromControler();
+						var cidxToHighlight = params["Drug"];
+						redraw(cidxToHighlight);
+						// drawTable
+						drawTable(params);
+					};
 				}
 			})
 
