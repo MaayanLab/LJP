@@ -103,6 +103,11 @@ function render_graph(graph) {
 				s.append("option").text(convertName(item))
 					.attr("value", item);
 			}
+			$("#Drug").selectize({
+				create: false,
+				sortField: 'text'
+			})
+
 			return val[0];
 		});
 
@@ -267,7 +272,7 @@ function render_graph(graph) {
 
 				// 2. update the legends
 				legendColor.scale(color)
-					.title('Belongs to Cluster #' + cidxToHighlight);
+					.title('Treated with ' + cidxToHighlight);
 				svg.select("#legendColor").html("")
 					.call(legendColor);
 
