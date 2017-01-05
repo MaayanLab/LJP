@@ -31,10 +31,21 @@ def load_LJP_net(net_path=None):
 	net.remove_edges_from(net.edges())
 	return net
 
-def load_enrichment_table():
-	df = pd.read_csv(CONFIG['ENRICH_TABLE_PATH'])
-	df.columns = ['Cidx', 'terms', 'RA', 'library', 'direction']
-	return df
+def load_enrichment_tables():
+	'''Load rank average tables for signatures clustered by Cidx and by DrugName'''
+	df1 = pd.read_csv(CONFIG['ENRICH_TABLE_PATH'])
+	df1.columns = ['Cidx', 'terms', 'RA', 'library', 'direction']
+	df2 = pd.read_csv(CONFIG['ENRICH_DRUG_TABLE_PATH'])
+	df2.columns = ['Drug', 'terms', 'RA', 'library', 'direction']
+
+	name_map = {
+		'MGI_Mammalian_Phenotype_Level_4': 'MGI_Mammalian_Phenotype',
+		'Epigenomics_Roadmap_HM_ChIP-seq': 'Epigenomics_Roadmap_HM',
+		'ENCODE_TF_ChIP-seq_2015': 'ENCODE_TF', 
+		'GO_Biological_Process_2015': 'GO_Biological_Process',	
+	}
+	df2['library'] = df2['library'].map(lambda x: name_map.get(x, x))
+	return {'Cidx': df1, 'Drug': df2}
 
 class EnrichmentResult(object):
 	"""EnrichmentResult: object for documents in the userResults collection"""

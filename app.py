@@ -3,17 +3,18 @@ Flask app handling enrichment against LJP data from user input up/dn gene sets a
 """
 
 import os, sys
+from collections import OrderedDict
 from flask import Flask, request, redirect, render_template
 
 from orm import *
 
 ENTER_POINT = CONFIG['ENTER_POINT']
 app = Flask(__name__, static_url_path=ENTER_POINT, static_folder=os.getcwd())
-app.debug = False
+app.debug = True
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 6
 
 # global variables
-TABLE = load_enrichment_table()
+TABLES = load_enrichment_tables()
 NET = load_LJP_net()
 NET0 = load_LJP_net(net_path=CONFIG['LJP_NET_PATH0'])  # the network without cluster enrichment
 CCLE = CCLESignatureCollection()
@@ -48,15 +49,33 @@ def annotation_page():
                            description=description,
                            script='annotation')
 
+@app.route(ENTER_POINT + '/drugs', methods=['GET'])
+def annotation_drugs():
+    """
+    Retrieve table for top enriched terms for drugs
+    """
+    description = ''''''
+    return render_template('index.html',
+                           description=description,
+                           script='annotation_drugs')
+
 
 @app.route(ENTER_POINT + '/controls', methods=['GET'])
 def controls_api():
+    table_name = request.args.get('table_name', 'Cidx')
     cidx = int(request.args.get('Cidx', 1))
+    drug_name = request.args.get('Drug', 'vemurafenib')
+
+    if table_name == 'Cidx': group = cidx 
+    else: group = drug_name
+
     library = request.args.get('library', None)
     direction = request.args.get('direction', None)
+    
+    TABLE = TABLES[table_name]
 
     if None in (cidx, library, direction):  # output meta
-        meta = {}
+        meta = OrderedDict()
         for col in TABLE.columns:
             if col not in ('terms', 'RA', 'library'):
                 meta[col] = TABLE[col].unique().tolist()
@@ -66,7 +85,7 @@ def controls_api():
         return json.dumps(meta)
     else:  # output subset of table
         sub_table = TABLE.loc[
-                    (TABLE['Cidx'] == cidx) &
+                    (TABLE[table_name] == group) &
                     (TABLE['library'] == library) &
                     (TABLE['direction'] == direction)
         , :][['terms', 'RA']]
