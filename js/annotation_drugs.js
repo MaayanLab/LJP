@@ -103,10 +103,6 @@ function render_graph(graph) {
 				s.append("option").text(convertName(item))
 					.attr("value", item);
 			}
-			$("#Drug").selectize({
-				create: false,
-				sortField: 'text'
-			})
 
 			return val[0];
 		});
@@ -293,6 +289,21 @@ function render_graph(graph) {
 				// drawTable
 				drawTable(params);
 			});
+
+			$("#Drug").selectize({
+				create: false,
+				sortField: 'text',
+				onChange: function(e){
+					// get new params from select
+					params = getParamsFromControler();
+					var cidxToHighlight = params["Drug"];
+					redraw(cidxToHighlight);
+					// drawTable
+					drawTable(params);
+				}
+			})
+
+
 
 			function resize() {
 				var width = $page.width(),
