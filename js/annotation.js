@@ -232,6 +232,36 @@ function render_graph(graph) {
 				.style("stroke-width", nominal_stroke)
 				.style("strok", "black");
 
+			// Prepare data for cluster labels
+			clusterCentroids = [] // an array of objs with {Cidx: Cidx, pos: {x:x, y:y} }
+			grouped = _.groupBy(graph.nodes, function(d) {return d.Cidx}) // group nodes by Cidx
+			for (var cidx in grouped) {
+				var n_nodes = grouped[cidx].length;
+
+				var x_centroid = _.reduce(grouped[cidx], function(memo, obj){ 
+					return memo + obj.position.x;}, 0) / n_nodes;
+				var y_centroid = _.reduce(grouped[cidx], function(memo, obj){ 
+					return memo + obj.position.y;}, 0) / n_nodes;
+				clusterCentroids.push({
+					x: x_centroid,
+					y: y_centroid,
+					n: n_nodes,
+					cidx: cidx,
+				})
+			}
+			console.log(clusterCentroids)
+
+			// Draw cluster labels on the g
+			var clusterLabel = g.selectAll("text")
+				.data(clusterCentroids)
+				.enter().append("text")
+				.attr("class", "cluster-label")
+				.attr("transform", function (d, i) {
+					return "translate(" + x(d.x) + "," + y(d.y) + ")";
+				})
+				.text(function(d) { return d.cidx; })
+				.style("font-size", "30px");
+
 
 			var text = node.append("text")
 				.attr("dy", ".35em")
@@ -327,11 +357,17 @@ function render_graph(graph) {
 					text.attr("display", function () {
 						return currentScale > text_display_scale ? "default" : "none";
 					});
+					clusterLabel.attr("display", function () {
+						return currentScale > text_display_scale ? "none" : "default";
+					});
+
 				} else {
 					text.attr("display", "none");
+					clusterLabel.attr("display", "default");
 				}
 
 				g.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+
 			}
 
 			// zoom out a little to display the whole view
