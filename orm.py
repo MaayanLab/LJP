@@ -1,6 +1,7 @@
 '''
 Database connections and Classes 
 '''
+import os
 import json, requests
 import pandas as pd
 import networkx as nx
@@ -20,6 +21,9 @@ COLL_RES = DB['userResults']
 
 ## CONFIGs
 RURL = CONFIG['RURL'] # URL for the Rook server doing enrichments
+# Overwrite config from env var
+CONFIG['RURL'] = os.environ['RURL']
+
 LJP_NET_PATH = CONFIG['LJP_NET_PATH']
 
 def load_LJP_net(net_path=None):

@@ -79,7 +79,8 @@ function render_graph(graph) {
     var zoom = d3.behavior.zoom().scaleExtent([min_zoom, max_zoom])
     var g = svg.append("g");
 
-    var sizeRange = [1, 4];
+    // var sizeRange = [1, 4];
+    var sizeRange = [2, 8];
 
     // Create DOMs for legend
     var legendG = svg.append("g")
