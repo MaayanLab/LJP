@@ -170,7 +170,8 @@ html {
 
 #footer h4,
 #footer a,
-#footer p {
+#footer p,
+#footer div {
     color: white;
     font-family: "Roboto", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
     opacity: .87;
